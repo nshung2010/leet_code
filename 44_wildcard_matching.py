@@ -50,9 +50,76 @@ class Solution(object):
         print(state)
         for char in s:
             state = set([transfer.get((at, token)) for at in state for token in [char, '*', '?']])
+            print(state)
         print(state)
         return accept in state
 
 A = Solution()
-c = A.isMatch("adceb", "*a*b")
+c = A.isMatch("adceb", "a*b*")
 print(c)
+
+"""
+# fast solution
+class Solution(object):
+    def isMatch(self, s, p):
+        
+        #:type s: str
+        #:type p: str
+        #:rtype: bool
+
+        # b is the expression
+        def xmatch(a,b):
+            if(len(a)!=len(b)):
+                return False
+            for i in xrange(len(a)):
+                if((not b[i]=='?') and (a[i]!=b[i])):
+                    return False
+            return True
+        if(p.find("*")==-1):
+            return xmatch(s,p)
+        #preprocessing
+        tail=0
+        for i in xrange(len(p)-1,-1,-1):
+            if(p[i]=='*'):
+                break
+            else:
+                tail+=1
+        head=p.find("*")
+        if(head!=0):
+            if(not xmatch(s[:head],p[:head])):
+                return False
+        if(tail!=0):
+            if(not xmatch(s[-tail:],p[-tail:])):
+                return False
+        if(len(s)<head+tail):
+            return False
+        s=s[head:len(s)-tail]
+        p=p[head:len(p)-tail].strip("*")
+        dp=p.split("*")
+        while("" in dp):
+            dp.remove("")
+        start=0
+        for item in dp:
+            if(start>=len(s)):
+                return False
+            if(not '?' in item):
+                loc=s.find(item,start)
+                if(loc!=-1):
+                    start=loc+len(item)
+                else:
+                    return False
+            else:
+                
+                flag=True
+                #if(start>=len(s)):
+                    #return False
+                print start,item,s
+                for k in xrange(start,len(s)-len(item)+1):
+                    if(xmatch(s[k:k+len(item)],item)):
+                        flag=False
+                        start=k+len(item)
+                        break
+                if(flag):
+                    return False
+        return True
+"""
