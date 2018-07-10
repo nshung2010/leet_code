@@ -3164,3 +3164,46 @@ class Solution(object):
             else:
                 stack.append((i,h))
         return max(temp)
+
+class Solution(object):
+    def largestRectangleArea(self, heights):
+        temp = []
+        stack = []
+        heights.append(float('-inf'))
+        for i,h in enumerate(heights):
+            cpos = i
+            while stack and h < stack[-1][0]:
+                ch, cpos = stack.pop()
+                temp.append(ch*(i - cpos ))
+            stack.append([h, cpos])
+        return max(temp) if temp else 0
+
+
+# 85: Maximal rectangle
+class Solution(object):
+    def maximalRectangle(self, matrix):
+        """
+        :type matrix: List[List[str]]
+        :rtype: int
+        """
+        if len(matrix) == 0 or matrix == [[]]:
+            return 0
+        n = len(matrix[0])
+        height = [0]*(n+1)
+        #height[n] = len(matrix)+1
+        res = 0
+        
+        for row in matrix:
+            for i in range(n):
+                height[i] = height[i] + 1 if row[i] == '1' else 0
+            stack = []
+            #print(height)
+            for i_pos, h in enumerate(height):
+                current_pos = i_pos
+                while stack and h < stack[-1][0]:
+                    current_h, current_pos = stack.pop()
+                    res = max(res, current_h*(i_pos-current_pos))
+                    #print(res)
+                stack.append([h, current_pos])
+        
+        return res
