@@ -3222,16 +3222,21 @@ class Solution(object):
         :type x: int
         :rtype: ListNode
         """
-        pre, pre.next =self, head
-        partion_less, partion_great = self, self
-        while pre.next:
-            if pre.next.val < x:
-                partion_less.next = pre.next
-            #else:
-            #    partion_great.next.val = pre.next.val
-            pre, partion_less = pre.next, partion_less.next
+        if not head:
+            return None
+        head_less = less = ListNode(0)
+        head_more = more = ListNode(0)
+        while head:
+            if head.val < x:
+                less.next = head
+                less = head
+            else:
+                more.next = head
+                more = head
+            
+            head = head.next
         
-       # partion_great.next = None
-        partion_less.next = partion_great
-        return self.next
-                
+        more.next = None
+        less.next = head_more.next
+        
+        return head_less.next
