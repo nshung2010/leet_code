@@ -3207,3 +3207,31 @@ class Solution(object):
                 stack.append([h, current_pos])
         
         return res
+
+# 86 partion list
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def partition(self, head, x):
+        """
+        :type head: ListNode
+        :type x: int
+        :rtype: ListNode
+        """
+        pre, pre.next =self, head
+        partion_less, partion_great = self, self
+        while pre.next:
+            if pre.next.val < x:
+                partion_less.next = pre.next
+            #else:
+            #    partion_great.next.val = pre.next.val
+            pre, partion_less = pre.next, partion_less.next
+        
+       # partion_great.next = None
+        partion_less.next = partion_great
+        return self.next
+                
