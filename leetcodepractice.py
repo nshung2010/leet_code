@@ -3240,3 +3240,12 @@ class Solution(object):
         less.next = head_more.next
         
         return head_less.next
+
+#86 Scramble string
+class Solution(object):
+    def isScramble(self, s1, s2):
+        """
+        :type s1: str
+        :type s2: str
+        :rtype: bool
+        """
