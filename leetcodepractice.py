@@ -3249,3 +3249,6 @@ class Solution(object):
         :type s2: str
         :rtype: bool
         """
+    if not s1 and not s2:
+    	return False
+    
