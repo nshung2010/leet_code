@@ -3251,4 +3251,7 @@ class Solution(object):
         """
     if not s1 and not s2:
     	return False
+
+   	if not s1 and s2:
+   		return True
     
