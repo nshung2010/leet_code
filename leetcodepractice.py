@@ -3249,8 +3249,19 @@ class Solution(object):
         :type s2: str
         :rtype: bool
         """
-    if not s1 and not s2:
-    	return False
+        if s1 == s2:
+            return True
+        
+        if len(s1) != len(s2) or sorted(s1) != sorted(s2):
+            return False
+        
+        for i in range(len(s1)-1):
+            if (self.isScramble(s1[0:i+1], s2[0:i+1]) and self.isScramble(s1[i+1:], s2[i+1:])) or \
+            (self.isScramble(s1[0:i+1], s2[-i-1:]) and self.isScramble(s1[i+1:], s2[0:-i-1])):
+                return True
+        return False
+
+
 
    	
     
