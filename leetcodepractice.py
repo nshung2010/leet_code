@@ -3290,4 +3290,38 @@ class Solution(object):
         else:
             nums1[m+n-1] = nums1[m-1]
             self.merge(nums1, m-1, nums2, n)
-        
+
+#89 Gray code
+class Solution(object):
+    def grayCode(self, n):
+        """
+        :type n: int
+        :rtype: List[int]
+        """
+        if n == 0:
+            return [0]
+        temp = self.grayCode(n-1)
+        res = temp[:] 
+        for num in temp[::-1]:
+            res.append(2**(n-1)+num)
+        return res
+
+# 90 Subsets II
+class Solution(object):
+    def subsetsWithDup(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        nums, lst, length = sorted(nums), [[]], [1]
+        for i in range(len(nums)):
+            if i>0 and nums[i] == nums[i-1]:
+                for j in range(length[-2], length[-1]):
+                    lst.append(lst[j]+ [nums[i]])
+                
+            else:
+                for j in range(len(lst)):
+                    lst.append(lst[j]+ [nums[i]])
+             
+            length.append(len(lst))
+        return lst
