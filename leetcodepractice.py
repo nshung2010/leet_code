@@ -3325,3 +3325,12 @@ class Solution(object):
              
             length.append(len(lst))
         return lst
+
+#91 Decode Ways
+class Solution(object):
+    def numDecodings(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        
