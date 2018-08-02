@@ -3333,4 +3333,48 @@ class Solution(object):
         :type s: str
         :rtype: int
         """
-        
+        if not s:
+            return 0
+        if len(s) == 1:
+            if s[0] == "0":
+                return 0
+            return 1
+        if len(s) == 2:
+            if (int(s) > 26 and s[1] != '0') or int(s)==10 or int(s) == 20:
+                return 1
+            if 10 < int(s) <= 26:
+                return 2
+            return 0
+            
+        dp = [0]*len(s)
+        dp[0] = self.numDecodings(s[0])
+        dp[1] = self.numDecodings(s[0:2])
+            
+        for i in range(2, len(s)):
+            if s[i] == '0':
+                if s[i-1] == '0' or int(s[i-1])>2:
+                    dp[i] = 0
+                else:
+                    dp[i] = dp[i-2]
+           
+            elif int(s[i-1:i+1]) > 26 or int(s[i-1:i+1]) < 10:
+                dp[i] = dp[i-1]
+            else:
+                dp[i] = dp[i-2]+dp[i-1]
+            
+        #print(dp)
+        return dp[-1]
+
+
+# an other solution
+def numDecodings(self, s):
+"""
+:type s: str
+:rtype: int
+"""
+    if not s or s[0]=='0': return 0
+    p=q=1
+    D=set(map(str,range(1,27)))
+    for i in range(1,len(s)): 
+        q,p=(s[i] in D)*q+(s[i-1:i+1] in D)*p,q
+    return q
