@@ -3378,3 +3378,30 @@ def numDecodings(self, s):
     for i in range(1,len(s)): 
         q,p=(s[i] in D)*q+(s[i-1:i+1] in D)*p,q
     return q
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def reverseBetween(self, head, m, n):
+        """
+        :type head: ListNode
+        :type m: int
+        :type n: int
+        :rtype: ListNode
+        """
+        if not head:
+            return None
+        first, second, temp = head, head, head
+        pos = 1
+        while temp.next:
+            temp = temp.next
+            pos +=1
+            if pos<m:
+                first = first.next
+            if pos<n:
+                second = 
+    def reversed_list(self, head):
