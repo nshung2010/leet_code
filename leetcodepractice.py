@@ -3385,6 +3385,36 @@ def numDecodings(self, s):
 #         self.val = x
 #         self.next = None
 
+class Solution:
+    def reverseBetween(self, head, m, n):
+        """
+        :type head: ListNode
+        :type m: int
+        :type n: int
+        :rtype: ListNode
+        """
+        current = head
+        Reverse = None
+        for i in range(1, n + 1):
+            temp = current.next
+            if i == m - 1:              # example: 1->2->3->4->5->None
+                first = current         # first: 1
+                end = current.next      # end: 2
+            if i >= m:
+                current.next = Reverse  # reverse linked list
+                Reverse = current
+            current = temp
+
+        if m == 1:                      # when m at begin
+            head.next = current
+            return Reverse
+
+        first.next = Reverse            # connect reverse linked list
+        end.next = current
+        
+        return head
+
+
 class Solution(object):
     def reverseBetween(self, head, m, n):
         """
@@ -3395,13 +3425,38 @@ class Solution(object):
         """
         if not head:
             return None
-        first, second, temp = head, head, head
-        pos = 1
-        while temp.next:
-            temp = temp.next
-            pos +=1
+        
+        first_tail, second_tail = head, head
+        
+        while pos<n:
             if pos<m:
-                first = first.next
-            if pos<n:
-                second = 
+                first_tail = first_tail.next
+            second_tail = second_tail.next 
+            pos +=1
+            
+        second_head = first_tail.next
+        third_head = second_tail.next
+        first_tail.next = None
+        second_tail.next = None
+        self.reversed_list(second_head)
+        first_tail.next = second_tail
+        second_head.next = third_head
     def reversed_list(self, head):
+        if not head:
+            return 
+        if head.next == None:
+            return
+        
+        pre, pre.next, cur = self, head, head
+        while cur.next:
+            cur = cur.next
+            pre = pre.next
+            
+        pre.next = None
+        temp_head = head.next
+        head.next = None
+        self.reversed_list(temp_head)
+        cur.next = temp_head
+        
+        
+        
