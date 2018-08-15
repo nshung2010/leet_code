@@ -3379,6 +3379,7 @@ def numDecodings(self, s):
         q,p=(s[i] in D)*q+(s[i-1:i+1] in D)*p,q
     return q
 
+#92: reverse between singly-linked list
 # Definition for singly-linked list.
 # class ListNode(object):
 #     def __init__(self, x):
@@ -3457,6 +3458,7 @@ class Solution(object):
         head.next = None
         self.reversed_list(temp_head)
         cur.next = temp_head
-        
+
+#94:
         
         
