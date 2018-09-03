@@ -3459,8 +3459,6 @@ class Solution(object):
         self.reversed_list(temp_head)
         cur.next = temp_head
 
-#94:
-
 #206 Reverse Linked List
 # Definition for singly-linked list.
 # class ListNode(object):
@@ -3474,6 +3472,8 @@ class Solution(object):
         :type head: ListNode
         :rtype: ListNode
         """
+        if not head:
+            return None
         if not head.next:
             return head
         cur = head
@@ -3483,7 +3483,38 @@ class Solution(object):
             cur.next = reverse
             reverse = cur
             cur = temp
-            print(reverse.val)
-        return cur
-              
         
+        cur.next = reverse
+        return cur
+
+#93 Resetore IP addresses
+class Solution(object):
+    def restoreIpAddresses(self, s):
+        """
+        :type s: str
+        :rtype: List[str]
+        """
+        return self.IpAddressesPossible(s, 4)
+            
+    
+    def IpAddressesPossible(self, s, k):
+        if not s or len(s) < k or len(s) > 3*k:
+            return []
+        if k==1 and self.isValidPart(s) :
+            return [s]
+        res = []
+        for i in range(1,4):
+            if k-1 <= len(s)-i <= 3*(k-1) and self.isValidPart(s[0:i]):
+                res+= (s[0:i]+"."+ v for v in self.IpAddressesPossible(s[i:], k-1))
+        return res
+    
+    def isValidPart(self, s):
+        if not s or len(s)>3:
+            return False
+        if s[0] == "0" and len(s)>1:
+            return False
+        if s=="0":
+            return True
+        if 0<int(s)<256:
+            return True
+        return False
