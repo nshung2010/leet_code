@@ -3518,3 +3518,35 @@ class Solution(object):
         if 0<int(s)<256:
             return True
         return False
+
+#95 Unique Binary Search Trees II
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def generateTrees(self, n):
+        """
+        :type n: int
+        :rtype: List[TreeNode]
+        """
+        if n==0:
+            return []
+        return self.get_all_trees(range(1, n+1))
+    
+    def get_all_trees(self, nums):
+        if not nums:
+            return [None]
+        
+        res = []
+        for i in range(len(nums)):
+            for left in self.get_all_trees(nums[0:i]):
+                for right in self.get_all_trees(nums[i+1:len(nums)]):
+                    tree = TreeNode(nums[i])
+                    tree.left = left
+                    tree.right = right
+                    res.append(tree)
+        return res
