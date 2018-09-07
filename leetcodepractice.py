@@ -3550,3 +3550,153 @@ class Solution(object):
                     tree.right = right
                     res.append(tree)
         return res
+
+#100: Same Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def isSameTree(self, p, q):
+        """
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: bool
+        """
+        if not p and not q:
+            return True
+        if not p and q:
+            return False
+        if p and not q:
+            return False
+        return p.val == q.val and self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
+
+#101 Symmetric Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def isSymmetric(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        all_val, stack = [], [root]
+        while stack:
+            temp_val, temp_tree_node = [], []
+            for x in stack:
+                if isinstance(x, TreeNode):
+                    temp_tree_node.append(x.left)
+                    temp_tree_node.append(x.right)
+                    temp_val.append(x.val)
+                else:
+                    temp_val.append(x)
+            stack = temp_tree_node
+            all_val.append(temp_val)
+        for level in all_val:
+            if level != level[::-1]:
+                return False
+        return True
+
+class Solution(object):
+    def isSymmetric(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        if not root: return True
+        return self.helper(root.left, root.right)
+    
+    def helper(self, left, right):
+        if left == right == None: return True
+        if not left or not right: return False
+        if left.val != right.val: return False
+        return self.helper(left.left, right.right) and self.helper(left.right, right.left)
+
+#102 Binary Tree Level Order Trversal:
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def levelOrder(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        all_val, stack = [], [root]
+        while stack:
+            temp_val, temp_tree_node = [], []
+            for x in stack:
+                if isinstance(x, TreeNode):
+                    temp_tree_node.append(x.left)
+                    temp_tree_node.append(x.right)
+                    temp_val.append(x.val)
+                elif x:
+                    temp_val.append(x)
+            print(temp_val)
+            if temp_val:
+                all_val.append(temp_val)
+            stack = temp_tree_node
+        return all_val
+"""
+Breadh First Search
+
+Using BFS, at any instant only L1 and L1+1 nodes are in the queue.
+When we start the while loop, we have L1 nodes in the queue.
+for _ in range(len(q)) allows us to dequeue L1 nodes one by one and add L2 children one by one.
+Time complexity: O(N). Space Complexity: O(N)
+"""
+from collections import deque
+class Solution(object):
+    def levelOrder(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        q, result = deque(), []
+        if root:
+            q.append(root)
+        while len(q):
+            level = []
+            for _ in range(len(q)):
+                x = q.popleft()
+                level.append(x.val)
+                if x.left:
+                    q.append(x.left)
+                if x.right:
+                    q.append(x.right)
+            result.append(level)
+        return result
+"""
+Depth First Search
+
+Use a variable to track level in the tree and use simple Pre-Order traversal
+Add sub-lists to result as we move down the levels
+Time Complexity: O(N)
+Space Complexity: O(N) + O(h) for stack space
+"""
+class Solution(object):
+    def levelOrder(self, root):
+        result = []
+        self.helper(root, 0, result)
+        return result
+    
+    def helper(self, root, level, result):
+        if root is None:
+            return
+        if len(result) <= level:
+            result.append([])
+        result[level].append(root.val)
+        self.helper(root.left, level+1, result)
+        self.helper(root.right, level+1, result)
