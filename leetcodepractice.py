@@ -3700,3 +3700,266 @@ class Solution(object):
         result[level].append(root.val)
         self.helper(root.left, level+1, result)
         self.helper(root.right, level+1, result)
+
+#103 Binary Tree Zigzag level order traversal
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+from collections import deque
+class Solution(object):
+    def zigzagLevelOrder(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        q, result, level_number = deque(), [], 0
+        if root:
+            q.append(root)
+        while len(q):
+            level = []
+            for _ in range(len(q)):
+                x = q.popleft()
+                level.append(x.val)
+                if x.left:
+                    q.append(x.left)
+                if x.right:
+                    q.append(x.right)
+            if level_number%2 == 1:
+                level = level[::-1]
+            level_number+= 1
+            result.append(level)
+        return result
+
+#104: maximum depth of binary Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+from collections import deque
+class Solution(object):
+    def maxDepth(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if not root:
+            return 0
+        tree_depth, de_que = 0, deque()
+        de_que.append(root)
+        while de_que:
+            has_level = False
+            for _ in range(len(de_que)):
+                x = de_que.popleft()
+                if x:
+                    has_level = True
+                if x.left:
+                    de_que.append(x.left)
+                if x.right:
+                    de_que.append(x.right)
+            if has_level:
+                tree_depth += 1
+        return tree_depth
+
+class Solution(object):
+    def maxDepth(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        return 1 + max(self.maxDepth(root.left), self.maxDepth(root.right)) if root else 0
+
+#105: Construct Binary Tree from Preorder and Inorder Traversal
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def buildTree(self, preorder, inorder):
+        """
+        :type preorder: List[int]
+        :type inorder: List[int]
+        :rtype: TreeNode
+        """
+        if not preorder and not inorder:
+            return None
+        root = TreeNode(preorder[0])
+        ind = inorder.index(root.val)
+        root.left = self.buildTree(preorder[1:ind+1], inorder[0:ind])
+        root.right = self.buildTree(preorder[ind+1:], inorder[ind+1:])
+        return root
+
+#106: Construct Binary Tree from Postorder and Inorder Traversal
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def buildTree(self, inorder, postorder):
+        """
+        :type inorder: List[int]
+        :type postorder: List[int]
+        :rtype: TreeNode
+        """
+        if not postorder and not inorder:
+            return None
+        root = TreeNode(postorder[-1])
+        ind = inorder.index(root.val)
+        root.left = self.buildTree(inorder[0:ind], postorder[0:ind])
+        root.right = self.buildTree(inorder[ind+1:], postorder[ind:-1])
+        return root
+
+#107: Binary Tree Level Order Trversal II
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+from collections import deque
+class Solution(object):
+    def levelOrderBottom(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        q, result = deque(), []
+        if root:
+            q.append(root)
+        while len(q):
+            level = []
+            for _ in range(len(q)):
+                x = q.popleft()
+                level.append(x.val)
+                if x.left:
+                    q.append(x.left)
+                if x.right:
+                    q.append(x.right)
+            result.append(level)
+        return result[::-1]
+
+# dfs recursively
+def levelOrderBottom1(self, root):
+    res = []
+    self.dfs(root, 0, res)
+    return res
+
+def dfs(self, root, level, res):
+    if root:
+        if len(res) < level + 1:
+            res.insert(0, [])
+        res[-(level+1)].append(root.val)
+        self.dfs(root.left, level+1, res)
+        self.dfs(root.right, level+1, res)
+        
+# dfs + stack
+def levelOrderBottom2(self, root):
+    stack = [(root, 0)]
+    res = []
+    while stack:
+        node, level = stack.pop()
+        if node:
+            if len(res) < level+1:
+                res.insert(0, [])
+            res[-(level+1)].append(node.val)
+            stack.append((node.right, level+1))
+            stack.append((node.left, level+1))
+    return res
+ 
+# bfs + queue   
+def levelOrderBottom(self, root):
+    queue, res = collections.deque([(root, 0)]), []
+    while queue:
+        node, level = queue.popleft()
+        if node:
+            if len(res) < level+1:
+                res.insert(0, [])
+            res[-(level+1)].append(node.val)
+            queue.append((node.left, level+1))
+            queue.append((node.right, level+1))
+    return res
+
+#108 Convert sorted array to Binary search Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def sortedArrayToBST(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: TreeNode
+        """
+        if not nums:
+            return None
+        n = len(nums)
+        root = TreeNode(nums[n//2])
+        root.left = self.sortedArrayToBST(nums[0:n//2])
+        root.right = self.sortedArrayToBST(nums[n//2+1:])
+        return root
+
+#109 Convert sorted link list to Binary search Tree
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def sortedListToBST(self, head):
+        """
+        :type head: ListNode
+        :rtype: TreeNode
+        """
+        if not head:
+            return None
+        if not head.next:
+            return TreeNode(head.val)
+        cur, length = head, 0
+        while cur.next:
+            length+=1
+            cur = cur.next
+        if length == 1:
+            root = TreeNode(head.next)
+            root.left = head
+            root.right = None
+        left, cur, temp_length = head, head, 0
+        while cur.next:
+            if temp_length < length//2-1:
+                left.next = cur.next
+                left = left.next
+            elif temp_length == length//2-1:
+                left.next = None
+                root = TreeNode(cur.next.val)
+            elif temp_length == length//2:
+                right = cur.next
+            else:
+                right.next = cur.next
+                right = right.next
+            temp_length += 1           
+            cur = cur.next
+        root.left = self.sortedListToBST(left)
+        root.right = self.sortedListToBST(right)
+        return root
+            
