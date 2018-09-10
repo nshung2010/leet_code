@@ -3940,26 +3940,27 @@ class Solution(object):
         while cur.next:
             length+=1
             cur = cur.next
-        if length == 1:
-            root = TreeNode(head.next)
-            root.left = head
-            root.right = None
-        left, cur, temp_length = head, head, 0
-        while cur.next:
-            if temp_length < length//2-1:
-                left.next = cur.next
-                left = left.next
-            elif temp_length == length//2-1:
-                left.next = None
-                root = TreeNode(cur.next.val)
+        
+        cur, temp_length = head, 0
+        if length>=2:
+            left = head
+        else:
+            left = None
+        right = None
+        while cur.next: 
+            temp = cur.next
+            if temp_length == length//2-1:
+                cur.next = None
+                
             elif temp_length == length//2:
+                mid = cur.val
                 right = cur.next
-            else:
-                right.next = cur.next
-                right = right.next
-            temp_length += 1           
-            cur = cur.next
+            cur = temp   
+            temp_length+=1
+
+        root = TreeNode(mid)
         root.left = self.sortedListToBST(left)
         root.right = self.sortedListToBST(right)
         return root
+            
             
