@@ -3963,4 +3963,168 @@ class Solution(object):
         root.right = self.sortedListToBST(right)
         return root
             
+#Q 97 Interleaving string
+class Solution(object):
+    def isInterleave(self, s1, s2, s3):
+        """
+        :type s1: str
+        :type s2: str
+        :type s3: str
+        :rtype: bool
+        """
+        if len(s3)!=len(s1) + len(s2):
+            return False
+        dp = [[""]*(len(s2)+1) for _ in range(len(s1)+1)]
+        
+        for i in range(len(s1)+1):
+            for j in range(len(s2)+1):
+                if i==0 and j==0:
+                    dp[i][j] = True
+                elif i==0:
+                    dp[i][j] = dp[i][j-1] and s2[j-1] == s3[i+j-1]
+                elif j==0:
+                    dp[i][j] = dp[i-1][j] and s1[i-1] == s3[i+j-1]
+                else:
+                    dp[i][j] = dp[i-1][j] and s1[i-1] == s3[i+j-1] or dp[i][j-1] and s2[j-1] == s3[i+j-1]
+        
+        return dp[-1][-1]
+
+#Q99 Recover Binary Search Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def recoverTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: void Do not return anything, modify root in-place instead.
+        """
+        self.pre, self.first, self.second = None, None, None
+        self.inOrderTranversal(root)
+        self.first.val, self.second.val = self.second.val, self.first.val
+    
+    def inOrderTranversal(self, root):
+        """
+        This is actually an inOrderTranversal problem. We will visit each node and
+        every time we found that the previous node.val > current node.val we set them 
+        as first and second "bad" node
+        """
+        if not root:
+            return None
+        self.inOrderTranversal(root.left)
+        if self.pre and self.pre.val > root.val:
+            if not self.first:
+                self.first = self.pre
             
+            self.second = root
+        self.pre = root
+        self.inOrderTranversal(root.right)
+
+#Q110 Balanced Binary Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def isBalanced(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        if not root:
+            return True
+        if abs(self.height(root.left)-self.height(root.right)) > 1:
+            return False
+        return self.isBalanced(root.left) and self.isBalanced(root.right)
+    
+    def height(self, root):
+        if not root:
+            return 0
+        return max(self.height(root.left), self.height(root.right))+1
+
+#Q111 Minimum Depth of Binary Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def minDepth(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if not root:
+            return 0
+        if not root.left and not root.right:
+            return 1
+        elif not root.left:
+            return self.minDepth(root.right) + 1
+        elif not root.right:
+            return self.minDepth(root.left) + 1
+        else:
+            return min(self.minDepth(root.left), self.minDepth(root.right))+1
+
+#Q112: Path Sum
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def hasPathSum(self, root, sum):
+        """
+        :type root: TreeNode
+        :type sum: int
+        :rtype: bool
+        """
+        if not root and sum is None:
+            return True
+        if not root and sum is not None:
+            return False
+        if not root.left and not root.right:
+            return root.val == sum
+        return self.hasPathSum(root.left, sum-root.val) or self.hasPathSum(root.right, sum-root.val)
+
+#113 Path Sum II
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def pathSum(self, root, sum):
+        """
+        :type root: TreeNode
+        :type sum: int
+        :rtype: List[List[int]]
+        """
+        res = []
+        def pathSumAll(root, sum, ans):
+            if not root:
+                return
+            if root.left is None and root.right is None:
+                if root.val == sum:
+                    ans.append(sum)
+                    res.append(ans)
+                    return
+            if root.left:
+                pathSumAll(root.left, sum-root.val, ans+[root.val])
+            if root.right:
+                pathSumAll(root.right, sum-root.val, ans+[root.val])
+                
+        pathSumAll(root, sum, [])
+        return res
