@@ -1983,10 +1983,7 @@ class Solution(object):
                     self.set_Q(i,j,'.')
         return False
        
-                    
-    
-    
-
+     
 class Solution(object):
     def solveNQueens(self, n):
         """
@@ -4309,3 +4306,39 @@ class Solution(object):
                 temp[i] = current_row[i] + min(last_row[i], last_row[i-1])
             dp = temp
         return min(dp)
+
+#121 Best time to buy and sell stock
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        if len(prices) < 2:
+            return 0
+        profit = 0
+        minimum = prices[0]
+        for i in range(1, len(prices)):
+            price = prices[i]
+            profit = max(profit, price-minimum)
+            minimum = min(minimum, price)
+        return profit
+
+#121 Best time to buy and sell stock II
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        if len(prices) < 2:
+            return 0
+        profit = 0
+        cur_min = prices[0]
+        for i in range(1, len(prices)):
+            if prices[i] < prices[i-1]:
+                profit += prices[i-1] - cur_min
+                cur_min = prices[i]
+        if prices[-1] > cur_min:
+            profit += prices[-1] - cur_min
+        return profit
