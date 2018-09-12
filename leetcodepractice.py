@@ -4128,3 +4128,82 @@ class Solution(object):
                 
         pathSumAll(root, sum, [])
         return res
+
+class Solution:
+    def pathSum(self, root, sum):
+        """
+        :type root: TreeNode
+        :type sum: int
+        :rtype: List[List[int]]
+        """
+        if root:
+            if root.left and root.right:
+                return ([[root.val]+i for i in self.pathSum(root.left, sum-root.val)]+
+                        [[root.val]+i for i in self.pathSum(root.right, sum-root.val)])
+            if root.left:
+                return [[root.val]+i for i in self.pathSum(root.left, sum-root.val)]
+            if root.right:
+                return [[root.val]+i for i in self.pathSum(root.right, sum-root.val)]
+            if root.val == sum:
+                return [[root.val]]
+        return []
+
+#114 Flatten Binary Tree to Linked List:
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    
+    def flatten(self, root):
+        """
+        :type root: TreeNode
+        :rtype: void Do not return anything, modify root in-place instead.
+        """
+        
+        
+        if not root:
+            return None
+        
+        self.pre = None
+        self.preOrder(root)
+    def preOrder(self, root):
+        temp1, temp2 = root.left, root.right
+        if self.pre:
+            self.pre.left = None
+            self.pre.right = root
+        self.pre = root
+        if temp1:
+            self.preOrder(temp1)
+        if temp2:
+            self.preOrder(temp2)
+
+#115 Distinct Subsequences
+class Solution(object):
+    def numDistinct(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: int
+        """
+        if len(s) < len(t):
+            return 0
+        dp = [[0]*(len(t) + 1) for _ in range(len(s) +1)]
+        for i in range(0, len(s)+1):
+            dp[i][0] = 1
+        
+        for i in range(1, len(s)+1):
+            for j in range(1, len(t)+1):
+                if i<j:
+                    dp[i][j] = 0
+                elif i==j:
+                    dp[i][j] = 1 if s[:i] == t[:j] else 0
+                else:
+                    dp[i][j] = dp[i-1][j-1] * int(s[i-1] == t[j-1]) + dp[i-1][j]
+        print(dp)
+        
+        return dp[-1][-1]
+                    
