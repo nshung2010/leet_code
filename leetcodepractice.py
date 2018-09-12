@@ -4206,4 +4206,106 @@ class Solution(object):
         print(dp)
         
         return dp[-1][-1]
-                    
+
+#116, 117. Populating next right pointers in each node               
+# Definition for binary tree with next pointer.
+# class TreeLinkNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+#         self.next = None
+# Definition for binary tree with next pointer.
+# class TreeLinkNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+#         self.next = None
+
+from collections import deque
+class Solution:
+    # @param root, a tree link node
+    # @return nothing
+    def connect(self, root):
+        q = deque()
+        if root:
+            q.append(root)
+            #root.next = None
+        while len(q):
+            pre_node = None
+            temp_length = len(q)
+            for i in range(temp_length): 
+                node = q.popleft()
+                if node.left:
+                    q.append(node.left)
+                if node.right:
+                    q.append(node.right)
+                if pre_node:
+                    pre_node.next = node 
+            
+                pre_node = node
+                
+        
+#118 Pascal's Triangle
+class Solution(object):
+    def generate(self, numRows):
+        """
+        :type numRows: int
+        :rtype: List[List[int]]
+        """
+        if numRows == 0:
+            return []
+        if numRows == 1:
+            return [[1]]
+        res = [[1]]
+        for row in range(1, numRows):
+            temp = [1]*(row+1)
+            pre_row = res[-1]
+            for i in range(1, row):
+                temp[i] = pre_row[i] + pre_row[i-1]
+            res.append(temp)
+        return res
+            
+#119 Pascal's Triangle II
+class Solution(object):
+    def getRow(self, rowIndex):
+        """
+        :type rowIndex: int
+        :rtype: List[int]
+        """
+
+        if rowIndex == 0:
+            return [1]
+    
+        pre_row = [1]
+        for row in range(1, rowIndex+1):
+            temp = [1]*(row+1)
+            for i in range(1, row):
+                temp[i] = pre_row[i] + pre_row[i-1]
+            pre_row = temp
+        return temp
+
+#120 Triangle
+class Solution(object):
+    def minimumTotal(self, triangle):
+        """
+        :type triangle: List[List[int]]
+        :rtype: int
+        """
+        if triangle == [[]]:
+            return 0
+        num_row = len(triangle)
+        if num_row == 1:
+            return triangle[0][0]
+        dp = triangle[0]
+        for row in range(1, num_row):
+            temp = [0]*(row+1)
+            last_row = dp
+            current_row = triangle[row]
+            temp[0] = current_row[0]+dp[0]
+            temp[-1] = current_row[-1] + dp[-1]
+            for i in range(1, row):
+                temp[i] = current_row[i] + min(last_row[i], last_row[i-1])
+            dp = temp
+        return min(dp)
