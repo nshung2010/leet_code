@@ -4342,3 +4342,95 @@ class Solution(object):
         if prices[-1] > cur_min:
             profit += prices[-1] - cur_min
         return profit
+
+#123 Best time to buy and sell stock III
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        if len(prices) < 2:
+            return 0
+        i = 0
+        #find all the valleys and peaks
+        peaks_valleys = []
+        while i < len(prices)-1:
+            while i < len(prices)-1 and prices[i] >= prices[i+1]:
+                i += 1
+            peaks_valleys.append(prices[i]) #add valleys
+            
+            while i< len(prices)-1 and prices[i] <= prices[i+1]:
+                i += 1
+            peaks_valleys.append(prices[i]) #add peaks
+        # get the maximum profit by looping over two event
+        if len(peaks_valleys) == 2:
+            return peaks_valleys[1]-peaks_valleys[0]
+        
+        profit = peaks_valleys[1]-peaks_valleys[0]
+        
+        for i in range(0, len(peaks_valleys), 2):
+            max_profit_pre_event = self.max_1_transaction_profit(peaks_valleys[0:i])
+            max_profit_after_event = self.max_1_transaction_profit(peaks_valleys[i:])
+            
+            profit = max(profit, max_profit_pre_event+ max_profit_after_event)
+        
+        return profit
+    
+    def max_1_transaction_profit (self, prices):
+        if len(prices) < 2:
+            return 0
+        profit = 0
+        minimum = prices[0]
+        for i in range(1, len(prices)):
+            price = prices[i]
+            profit = max(profit, price-minimum)
+            minimum = min(minimum, price)
+        return profit
+
+# sol 2:
+class Solution(object):
+    def maxProfit(self, prices):
+        
+        if len(prices)<=1: return 0
+        
+        # O(n) counting from left, find the max gain up to each day (not ending at each day)
+        left = [0]*len(prices)
+        curmin = prices[0]
+        for i in range(1, len(prices)):
+            curmin = min(curmin, prices[i])
+            left[i] = max(prices[i]-curmin, left[i-1])
+         
+        # O(n) counting from right 
+        right = [0]*len(prices)
+        curmax = prices[-1]
+        for i in range(len(prices)-2, -1, -1):
+            curmax = max(curmax, prices[i])
+            right[i] = max(curmax-prices[i], right[i+1])
+            
+        # O(n)   
+        max2t = 0
+        for i in range(len(prices)):
+            max2t = max(max2t, left[i] + right[i])
+                return max2t   
+# best solution
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        dp[k, i] = max(dp[k, i-1], prices[i] - (prices[j] - dp[k-1, j-1])) for j=0,..,i
+        
+        need to find the min of (prices[j] - dp[k-1, j-1]) for all j < i
+        we name this min_potential_lost
+        """
+        if not prices:
+            return 0
+        dp=[0] * 3
+        min_potential_lost = [prices[0]] * 3
+        for i in range(1, len(prices)):
+            for k in range(1, 3):
+                min_potential_lost[k] = min(min_potential_lost[k], prices[i] - dp[k-1])
+                dp[k] = max(dp[k], prices[i] - min_potential_lost[k])
+        return dp[2]
+        
