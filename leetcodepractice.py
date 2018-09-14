@@ -4434,3 +4434,67 @@ class Solution(object):
                 dp[k] = max(dp[k], prices[i] - min_potential_lost[k])
         return dp[2]
         
+#124: Binary Tree Maximum path Sum
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def maxPathSum(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if not root:
+            return 0
+        self.res = root.val
+        a = self.max1BranchSum(root)
+        return self.res
+    def max1BranchSum(self, root):
+        """
+        this one will return the maximum branch (either left or right of a root)
+        """
+        if not root:
+            return 0
+        max_left = self.max1BranchSum(root.left)
+        max_right = self.max1BranchSum(root.right) 
+        max_sum = max(max_left, max_right, 0) + root.val
+        self.res = max(self.res, max_sum, max_left + max_right + root.val)
+        return max_sum
+
+#sol 2:
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def maxPathSum(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if not root:
+            return 0
+        self.res = root.val
+        from_root, no_root = self.twoMaxPath(root)
+        return max(from_root, no_root)
+    def twoMaxPath(self, root):
+        """
+        this one will return two max values: one go from the root and the other didn't from the root
+        """
+        if not root:
+            return float("-inf"), float("-inf")
+        if not root.left and not root.right:
+            return root.val, float("-inf")
+        
+        from_root_left, no_root_left = self.twoMaxPath(root.left)
+        from_root_right, no_root_right = self.twoMaxPath(root.right)
+        from_root = max(from_root_left + root.val, from_root_right + root.val, root.val)
+        no_root = max(no_root_left, no_root_right, from_root_left, from_root_right, from_root_left+root.val+from_root_right)
+        return from_root, no_root
