@@ -4498,3 +4498,33 @@ class Solution(object):
         from_root = max(from_root_left + root.val, from_root_right + root.val, root.val)
         no_root = max(no_root_left, no_root_right, from_root_left, from_root_right, from_root_left+root.val+from_root_right)
         return from_root, no_root
+
+#183 SQL Customers who never orders
+# Write your MySQL query statement below
+SELECT Customers.name AS 'Customers' from Customers 
+WHERE id NOT IN (SELECT CustomerId from Orders)
+#595 SQL Big Countries
+# Write your MySQL query statement below
+SELECT name, population, area from world
+WHERE population>25000000 OR area>3000000
+
+#125 Valid Palindrome
+class Solution(object):
+    def isPalindrome(self, s):
+        """
+        :type s: str
+        :rtype: bool
+        """
+        if not s:
+            return True
+        l, r = 0, len(s)-1
+        while l<r:
+            while not s[l].isalnum() and l<r:
+                l+=1
+            while not s[r].isalnum() and r>l:
+                r-=1
+            if l<r and s[l].lower() != s[r].lower():
+                return False
+            l+=1
+            r-=1
+        return True
