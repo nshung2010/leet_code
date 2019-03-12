@@ -4566,3 +4566,63 @@ class Solution(object):
             level = next_level
 
         return res
+
+
+# 129:
+# 130: Surrounded Regions
+class Solution(object):
+    def solve(self, board):
+        """
+        :type board: List[List[str]]
+        :rtype: None Do not return anything, modify board in-place instead.
+        """
+        if board == []:
+            return
+        queue = collections.deque([])
+
+        n_r = len(board)
+        n_c = len(board[0])
+        for r in range(n_r):
+            for c in range(n_c):
+                if ( (r in [0, n_r-1]) or (c in [0, n_c-1]) ) and board[r][c] == 'O':
+                    queue.append((r, c))
+        while queue:
+            (r, c) = queue.popleft()
+            if (0<=r<n_r) and (0<=c<n_c) and board[r][c] == 'O':
+                board[r][c] = 'D' # mark this one as Dont Change (D)
+                queue.append((r-1, c))
+                queue.append((r, c-1))
+                queue.append((r+1, c))
+                queue.append((r, c+1))
+
+        for r in range(n_r):
+            for c in range(n_c):
+                if board[r][c] == 'O':
+                    board[r][c] = 'X'
+                elif board[r][c] == 'D':
+                    board[r][c] = 'O'
+
+# 131 Palindrome partioning
+class Solution(object):
+    def partition(self, s):
+        """
+        :type s: str
+        :rtype: List[List[str]]
+        """
+        res = []
+        self.dfs(s, [], res)
+        return res
+
+    def dfs(self, s, path, res):
+        if not s:
+            res.append(path)
+            return
+        for i in range(1, len(s)+1):
+            if self.is_palindrome(s[:i]):
+                self.dfs(s[i:], path + [s[:i]], res)
+
+    def is_palindrome(self, s):
+        return s == s[::-1]
+
+# 132 Palindrome partioning II
+
