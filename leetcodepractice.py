@@ -4626,3 +4626,34 @@ class Solution(object):
 
 # 132 Palindrome partioning II
 
+class Solution(object):
+    def minCut(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        if s is None or len(s)==1 or s==s[::-1]:
+            return 0
+
+        for i in range(1, len(s)):
+            if s[:i] == s[:i][::-1] and s[i:] == s[i:][::-1]:
+                return 1
+
+        min_cut=[0] # starting value for i = 0
+
+        is_palindrome = [[False] * len(s) for _ in s]
+
+        for i in range(1, len(s)):
+            min_min_cut = float('inf')
+            for j in range(i, -1, -1):
+
+                # check if s[j:i+1] is palindrome:
+                if ((j==i) or (j==i-1 and s[i]==s[j]) or (s[i]==s[j] and is_palindrome[j+1][i-1])):
+                    is_palindrome[j][i] = True
+                    if j==0:
+                        cur_min_cut = 0
+                    else:
+                        cur_min_cut = min_cut[j-1] + 1
+                    min_min_cut = min_min_cut if min_min_cut < cur_min_cut else cur_min_cut
+            min_cut.append(min_min_cut)
+        return min_cut[len(s)-1]
