@@ -4657,3 +4657,81 @@ class Solution(object):
                     min_min_cut = min_min_cut if min_min_cut < cur_min_cut else cur_min_cut
             min_cut.append(min_min_cut)
         return min_cut[len(s)-1]
+
+# 133   clone graph
+"""
+# Definition for a Node.
+class Node(object):
+    def __init__(self, val, neighbors):
+        self.val = val
+        self.neighbors = neighbors
+"""
+class Solution(object):
+    def cloneGraph(self, node):
+        """
+        :type node: Node
+        :rtype: Node
+        """
+        if node is None:
+            return start
+        stack = []
+        clone = {}
+        clone[node] = Node(node.val, [])
+        stack.append(node)
+
+        while stack:
+            temp_node = stack.pop()
+            for nb in temp_node.neighbors:
+                if nb not in clone:
+                    clone[nb] = Node(nb.val, [])
+                    stack.append(nb)
+                clone[temp_node].neighbors.append(clone[nb])
+        return clone[node]
+
+# 134 Gas station
+class Solution:
+    def canCompleteCircuit(self, gas, cost):
+
+        st, mx, s = -1, -1, 0
+        for i in range(len(gas)-1, -1, -1):
+            s += gas[i] - cost[i]
+            if s > mx:
+                mx, st = s, i
+        return st if s >= 0 else -1
+# 135 candy
+class Solution(object):
+    def candy(self, ratings):
+        """
+        :type ratings: List[int]
+        :rtype: int
+        """
+        if len(ratings) <= 1:
+            return len(ratings)
+        up, down, slope, next_slope, candy = 0, 0, 0, 0, 0
+
+        for i in range(1, len(ratings)):
+            if ratings[i] > ratings[i-1]:
+                next_slope = 1
+            elif ratings[i] < ratings[i-1]:
+                next_slope = -1
+            else:
+                next_slope = 0
+
+            if  (slope > 0 and next_slope ==0) or (slope <0 and next_slope >=0):
+                # print(i, up, down, slope, next_slope, candy)
+                candy += self.count(up) + self.count(down) + max(up, down)
+                up = 0
+                down = 0
+
+            if next_slope > 0:
+                up += 1
+            elif next_slope < 0:
+                down += 1
+            else:
+                candy += 1
+
+            slope = next_slope
+        candy += self.count(up) + self.count(down) + max(up, down) + 1
+        return candy
+    def count(self, x):
+        return x*(x+1)//2
