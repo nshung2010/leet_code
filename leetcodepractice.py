@@ -4673,7 +4673,7 @@ class Solution(object):
         :rtype: Node
         """
         if node is None:
-            return start
+            return None
         stack = []
         clone = {}
         clone[node] = Node(node.val, [])
@@ -4735,3 +4735,198 @@ class Solution(object):
         return candy
     def count(self, x):
         return x*(x+1)//2
+
+# 136 single number
+from collections import Counter
+class Solution(object):
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        freq = Counter(nums)
+        for key in freq.keys():
+            if freq[key] == 1:
+                return key
+
+class Solution(object):
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        a = 0
+        for i in nums:
+            a ^= i
+        return a
+
+class Solution(object):
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        return 2 * sum(set(nums)) - sum(nums)
+
+# 137 single number II
+class Solution(object):
+    def singleNumber(self, nums):
+        a = b = 0
+        for n in nums:
+            b = (b^n)&~a
+            a = (a^n)&~b
+        return b
+
+# 138. copy list with random pointer
+"""
+# Definition for a Node.
+class Node(object):
+    def __init__(self, val, next, random):
+        self.val = val
+        self.next = next
+        self.random = random
+"""
+class Solution(object):
+    def copyRandomList(self, head):
+        """
+        :type head: Node
+        :rtype: Node
+        """
+        if head is None:
+            return
+        stack = []
+        clone = {}
+        clone[head] = Node(head.val, None, None )
+        stack.append(head)
+
+        while stack:
+            temp_node = stack.pop()
+            n = temp_node.next
+            r = temp_node.random
+            if n:
+                if n not in clone:
+                    clone[n] = Node(n.val, None, None)
+                    stack.append(n)
+                clone[temp_node].next = clone[n]
+
+            if r:
+                if r not in clone:
+                    clone[r] = Node(r.val, None, None)
+                    stack.append(r)
+                clone[temp_node].random = clone[r]
+
+        return clone[head]
+
+#139 Word break
+class Solution(object):
+    def wordBreak(self, s, wordDict):
+        """
+        :type s: str
+        :type wordDict: List[str]
+        :rtype: bool
+        """
+        if s in wordDict:
+            return True
+        dp = [False] * (len(s)+1)
+        dp[0] = True
+        for i in range(1, len(s)+1):
+            for j in range(i):
+                if s[j:i] in wordDict and dp[j]:
+                    dp[i] = True
+                    break
+
+        return dp[-1]
+
+class Solution(object):
+    def wordBreak(self, s, wordDict):
+        for word in wordDict:
+            self.insert(word)
+        self.search(s)
+        if self.count > 0:
+            return True
+        else:
+            return False
+
+    # Trie build up
+    def __init__(self):
+        self.root={}
+        self.count = 0
+
+    def insert(self, word):
+        p = self.root
+        for c in word:
+            if c not in p.keys():
+                p[c] = {}
+            p = p[c]
+        p['#'] = True
+
+    # search function
+    def search(self, word):
+        memo = []
+        return self.find(word, 0, len(word), memo)
+
+    def find(self, prefix, start, end, memo):
+        p = self.root
+        if start == end:
+            self.count += 1
+        for index, c in enumerate(prefix[start:]):
+            # one solution possible, end process
+            if self.count > 0:
+                break
+            # word not in trie, break up
+            if c not in p.keys():
+                break
+            # record index success, reduce recursion
+            if start + index in memo:
+                p=p[c]
+                continue
+            if '#' in p[c]:
+                memo.append(start+index)
+                self.find(prefix, start+index+1, end, memo)
+            p=p[c]
+
+class Solution(object):
+    def wordBreak(self, s, wordDict):
+        """
+        :type s: str
+        :type wordDict: List[str]
+        :rtype: bool
+        """
+        lookBackLen = set()
+        for w in wordDict:
+            lookBackLen.add(len(w))
+        wordDict = set(wordDict)
+
+        d = [False] * len(s)
+        for i in range(len(s)):
+            for b in lookBackLen:
+                if s[i+1-b:i+1] in wordDict and (i-b < 0 or d[i-b]):
+                    d[i] = True
+
+        return d[-1]
+
+#140 word break II
+class Solution(object):
+    def wordBreak(self, s, wordDict):
+        self.lens = sorted(list(set([len(word) for word in wordDict])))
+        self.dic = {l: set() for l in self.lens}
+        for word in wordDict:
+            self.dic[len(word)].add(word)
+        return self.find(s, {})
+
+    def find(self, s, memo):
+        if s in memo:
+            return memo[s]
+        res = []
+        sL = len(s)
+        for l in self.lens:
+            ch = s[:l]
+            if ch in self.dic[l]:
+                if l < sL:
+                    for word in self.find(s[l:], memo):
+                        res.append(ch + ' ' + word)
+                else:
+                    res.append(ch)
+                    break
+        memo[s] = res
+        return res
