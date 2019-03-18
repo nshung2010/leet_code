@@ -4930,3 +4930,503 @@ class Solution(object):
                     break
         memo[s] = res
         return res
+
+# 141 linked list cycle:
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def hasCycle(self, head):
+        """
+        :type head: ListNode
+        :rtype: bool
+        """
+        if head is None:
+            return False
+        slow = head
+        fast = head.next
+        while slow != fast:
+            if fast is None or fast.next is None:
+                return False
+            slow=slow.next
+            fast = fast.next.next
+        return True
+
+# 142 Linked list cycle II:
+    # Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def detectCycle(self, head):
+        """
+        :type head: ListNode
+        :rtype: node
+        """
+        if head is None:
+            return None
+        node_meet = self.isCycle(head)
+        if node_meet is None:
+            return None
+
+        cur = head
+        while node_meet != cur:
+            node_meet = node_meet.next
+            cur = cur.next
+        return node_meet
+    def isCycle(self, head):
+        """
+        detect if there is circle. return the node where fast meet slow
+        :type head: ListNode
+        :rtype: node
+        """
+        slow = fast = head
+        while (fast is not None) and (fast.next is not None):
+            slow=slow.next
+            fast = fast.next.next
+            if slow == fast:
+                return slow
+        return None
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def reorderList(self, head):
+        """
+        :type head: ListNode
+        :rtype: None Do not return anything, modify head in-place instead.
+        """
+
+        if not head:    return head
+
+        low = fast = head
+        while fast and fast.next:
+            low = low.next
+            fast = fast.next.next
+
+        tmp = low.next
+        low.next = None
+
+        # reverse the right half
+        tail = cur = tmp
+        while cur and cur.next:
+            cur = cur.next
+            tail.next = cur.next
+            cur.next = tmp
+            tmp = cur
+            cur = tail
+
+        # insert in order
+        mid = tmp
+        while mid:
+            tmp = mid.next
+            mid.next = head.next
+            head.next = mid
+            head = head.next.next
+            mid = tmp
+
+# 144 Binary Tree Preorder Traversal:
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def preorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        if root is None:
+            return []
+        stack = [root]
+        out_put = []
+
+        while stack:
+            node = stack.pop()
+            if node.val:
+                out_put.append(node.val)
+            if node.right:
+                stack.append(node.right)
+            if node.left:
+                stack.append(node.left)
+        return out_put
+
+# 146 LRU Cacche
+class LRUCache(object):
+
+    def __init__(self, capacity):
+        """
+        :type capacity: int
+        """
+        self.capacity = capacity
+        self.key_list = {} # contains key values pairs
+        self.start_idx = 0 # current index of start of list
+        self.list = [] # contains keys in ordered of used
+        self.current_size = 0 # current size of cache
+        self.key_list_idx = {} # index where the key is stored in the list/array
+
+    def re_order_list(self, key):
+        if self.key_list_idx[key] == len(self.list) - 1: # if the key is the most recent used
+            return
+        self.list[self.key_list_idx[key]] = None
+        self.key_list_idx[key] = len(self.list)
+        self.list.append(key)
+        return
+    def get(self, key):
+        """
+        :type key: int
+        :rtype: int
+        """
+        if key not in self.key_list:
+            return -1
+        else:
+            self.re_order_list(key)
+            return self.key_list[key]
+
+    def put(self, key, value):
+        """
+        :type key: int
+        :type value: int
+        :rtype: None
+        """
+        if self.capacity < 1:
+            return
+        if key in self.key_list:
+            self.key_list[key] = value
+            self.re_order_list(key)
+            return
+        if self.current_size == self.capacity:
+            while self.list[self.start_idx] is None:
+                self.start_idx += 1
+            remove_el = self.list[self.start_idx]
+            self.key_list.pop(remove_el, None)
+            self.key_list_idx.pop(remove_el, None)
+            self.start_idx += 1
+        else:
+            self.current_size += 1
+        self.key_list[key] = value
+        self.key_list_idx[key] = len(self.list)
+        self.list.append(key)
+
+
+
+# Your LRUCache object will be instantiated and called as such:
+# obj = LRUCache(capacity)
+# param_1 = obj.get(key)
+# obj.put(key,value)
+
+# 147. Insertion sort list
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def insertionSortList(self, head):
+        p = dummy = ListNode(0)
+        cur = dummy.next = head
+        while cur and cur.next:
+            val = cur.next.val
+            if cur.val < val:
+                cur = cur.next
+                continue
+            if p.next.val > val:
+                p = dummy
+            while p.next.val < val:
+                p = p.next
+            new = cur.next
+            cur.next = new.next
+            new.next = p.next
+            p.next = new
+        return dummy.next
+
+class Solution(object):
+    def sortList(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        length, h = 0, head
+        while h:
+            length += 1
+            h = h.next
+        return self.merge_sort_list(head, length)
+
+    def merge(self, head1, head2):
+        dummy = merge_head=ListNode(0)
+        while head1 and head2:
+            if head1.val < head2.val:
+                merge_head.next = head1
+                head1 = head1.next
+            else:
+                merge_head.next = head2
+                head2 = head2.next
+            merge_head = merge_head.next
+        merge_head.next = head1 or head2
+        return dummy.next
+
+    def merge_sort_list(self, head, length):
+        if length <= 1:
+            return head
+        mid, ct = head, 1
+        while ct < length//2:
+            mid = mid.next
+            ct += 1
+        second_half = mid.next
+        mid.next = None
+        l1 = self.merge_sort_list(head, length//2)
+        l2 = self.merge_sort_list(second_half, length - length//2)
+        return self.merge(l1, l2)
+
+#149 Max points on a line
+#150 Evaluate reverse plish notation
+class solution(object):
+    def evalRPN(self, tokens):
+            """
+            :type tokens: List[str]
+            :rtype: int
+            """
+            stack = []
+
+            for x in tokens:
+                if x in ['+', '-', '*', '/']:
+                    num1 = stack.pop()
+                    num2 = stack.pop()
+                    if x=='+':
+                        num = num1 + num2
+                    elif x=='-':
+                        num = num2 - num1
+                    elif x=='*':
+                        num = num1*num2
+                    elif x=='/':
+                        num = int(num2/float(num1))
+                    stack.append(num)
+                else:
+                    stack.append(int(x))
+            return stack[0]
+
+# 151
+# 152 Maximum product subarray
+class Solution(object):
+    def maxProduct(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+
+        if not nums:
+            return 0
+
+        n = len(nums)-1
+
+        max_up_to = [0] * (n+1)
+        max_up_to[0] = nums[0]
+
+        min_up_to = [0] * (n+1)
+        min_up_to[0] = nums[0]
+
+        for i in range(1, n+1):
+            max_up_to[i] = max(max_up_to[i-1] * nums[i],
+                               min_up_to[i-1] * nums[i],
+                               nums[i])
+            min_up_to[i] = min(max_up_to[i-1] * nums[i],
+                               min_up_to[i-1] * nums[i],
+                               nums[i])
+
+        return max(max_up_to)
+
+class Solution(object):
+    def maxProduct(self, A):
+        B = A[::-1]
+        for i in range(1, len(A)):
+            A[i] *= A[i - 1] or 1
+            B[i] *= B[i - 1] or 1
+        return max(A+B)
+
+# 153 Find minimum in rotated sorted array
+class Solution:
+    def findMin(self, nums: List[int]) -> int:
+        if len(nums) < 3:
+            return min(nums)
+        if(nums[0] < nums[-1]):
+            return nums[0]
+        mid = (len(nums)-1) // 2
+        if nums[0] < nums[mid]:
+            return self.findMin(nums[mid+1:])
+        else:
+            return self.findMin(nums[:mid+1])
+
+class Solution(object):
+    def findMin(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) == 1:
+            return nums[0]
+        idx = 0
+
+        while idx<len(nums)-2 and nums[idx] < nums[idx+1]:
+            idx += 1
+        return min(nums[0], nums[idx+1], nums[-1])
+# 154 find minimum in roated sorted array II
+class Solution(object):
+    def findMin(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums:
+            return None
+        if len(nums) == 1:
+            return nums[0]
+
+        if nums[0] < nums[-1]:
+            return nums[0]
+
+        left, right = 0, len(nums)-1
+
+        while left < right:
+
+            mid = (left + right)//2
+
+            if nums[mid] > nums[right]:
+                left = mid + 1
+            elif nums[mid] < nums[right]:
+                right = mid
+            else:
+                right -= 1
+
+        return nums[left]
+
+# 155 Min stack:
+class MinStack(object):
+
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.data = []
+        self.min = None
+
+    def push(self, x):
+        """
+        :type x: int
+        :rtype: None
+        """
+        if self.min is None:
+            self.min = x
+        else:
+            self.min = min(x, self.min)
+        self.data.append(x)
+
+    def pop(self):
+        """
+        :rtype: None
+        """
+        x = self.data[-1]
+        self.data.pop()
+        if self.min == x and self.data != []:
+            self.min = min(self.data)
+        elif self.min ==x and self.data == []:
+            self.min = None
+    def top(self):
+        """
+        :rtype: int
+        """
+        return self.data[-1]
+
+    def getMin(self):
+        """
+        :rtype: int
+        """
+        return self.min
+
+#160: Intersection of Two linked lists
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def getIntersectionNode(self, headA, headB):
+        """
+        :type head1, head1: ListNode
+        :rtype: ListNode
+        """
+        p1, p2 = headA, headB
+        while p1 is not p2:
+            p1 = headB if p1 is None else p1.next
+            p2 = headA if p2 is None else p2.next
+        return p1
+
+# 162 Find Peak Element
+class Solution(object):
+    def findPeakElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums:
+            return None
+        return self.search_peak(nums,0, len(nums)-1)
+    def search_peak(self, nums, l, r):
+        if l==r:
+            return l
+        mid = (l+r)//2
+        if nums[mid]>nums[mid+1]:
+            return self.search_peak(nums,l, mid)
+        return self.search_peak(nums, mid+1, r)
+
+# 164 Maxium Gap
+#Pigeonhole buckets
+class Bucket:
+    def __init__(self):
+        self.isUsed = False
+        self.minVal = float("inf")
+        self.maxVal = -float("inf")
+
+class Solution:
+    def maximumGap(self, nums):
+        n = len(nums)
+
+        if n < 2:
+            return 0
+        minNum = min(nums)
+        maxNum = max(nums)
+
+        bucketSize = max(1, (maxNum - minNum) // (n - 1))
+        bucketNum = (maxNum - minNum) // bucketSize + 1
+
+        buckets = [Bucket() for _ in range(bucketNum)]
+
+        for num in nums:
+            bucketIdx = (num - minNum) // bucketSize
+            buckets[bucketIdx].isUsed = True
+            buckets[bucketIdx].minVal = min(buckets[bucketIdx].minVal, num)
+            buckets[bucketIdx].maxVal = max(buckets[bucketIdx].maxVal, num)
+
+        res = 0
+        prevEnd = None
+        for bucket in buckets:
+            if not bucket.isUsed: continue
+
+            if prevEnd != None:
+                res = max(res, bucket.minVal - prevEnd)
+            prevEnd = bucket.maxVal
+
+        return res
