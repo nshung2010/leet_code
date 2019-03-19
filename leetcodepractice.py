@@ -5430,3 +5430,125 @@ class Solution:
             prevEnd = bucket.maxVal
 
         return res
+#165 Compare version numbers:
+class Solution(object):
+    def compareVersion(self, version1, version2):
+        """
+        :type version1: str
+        :type version2: str
+        :rtype: int
+        """
+
+        version1 = map(int, version1.split('.'))
+        version2 = map(int, version2.split('.'))
+
+        if len(version1) > len(version2):
+            version2 += [0] * (len(version1) - len(version2))
+        else:
+            version1 += [0] * (len(version2) - len(version1))
+
+        for i in range(len(version1)):
+            if version1[i] > version2[i]:
+                return 1
+            elif version1[i] < version2[i]:
+                return -1
+
+        return 0
+
+#166
+class Solution(object):
+    def fractionToDecimal(self, numerator, denominator):
+        """
+        :type numerator: int
+        :type denominator: int
+        :rtype: str
+        """
+        if numerator % denominator == 0:
+            return str(numerator//denominator)
+        res = []
+        if numerator * denominator < 0:
+            res.append('-')
+        numerator, denominator = abs(numerator), abs(denominator)
+        mod, remainder = divmod(numerator, denominator)
+        res.append(str(mod))
+        res.append('.')
+        dict = {}
+        idx = len(res)-1
+        while remainder != 0:
+            if remainder not in dict:
+                idx += 1
+                dict[remainder] = idx
+                mod, remainder = divmod(remainder*10, denominator)
+                res.append(str(mod))
+            else:
+                res.insert(dict[remainder], '(')
+                res.append(')')
+                break
+        return "".join(res)
+
+# 167 Two sum II- input array is sorted
+class Solution(object):
+    def twoSum(self, numbers, target):
+        """
+        :type numbers: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        left = 0
+        right = len(numbers) - 1
+        while left < right:
+            if numbers[left] + numbers[right] == target:
+                return [left+1, right+1]
+            elif numbers[left] + numbers[right] > target:
+                right -= 1
+            else:
+                left += 1
+        return []
+
+#168: Excel sheet column title:
+class Solution(object):
+    def convertToTitle(self, n):
+        """
+        :type n: int
+        :rtype: str
+        """
+        Alphabet = {0:"Z"}
+        for i in range(25):
+            Alphabet[i+1] = chr(i+65)
+
+        res = []
+
+        while n > 0:
+            n, rem = divmod(n, 26)
+            if rem==0:
+                n -= 1
+            res.append(Alphabet[rem])
+
+        return "".join(res[::-1])
+
+#169: Majority Element
+class Solution(object):
+    def majorityElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        counts = collections.Counter(nums)
+        return max(counts.keys(), key=counts.get)
+
+#170:
+#171: Excel sheet column number
+class Solution(object):
+    def titleToNumber(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        dict = {"Z":26}
+        for i in range(25):
+            dict[chr(i+65)] = i+1
+        n = len(s)
+        res = 0
+        for i, char in enumerate(s):
+            res += 26**(n-1-i)*dict[char]
+        return res
