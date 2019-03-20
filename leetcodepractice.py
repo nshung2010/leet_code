@@ -2481,7 +2481,11 @@ class Solution(object):
         if count_digit == 0:
             return False
         if count_e == 1:
-            return self.isNumber(s[0:ind_e]) and self.isNumber(s[ind_e+1:]) and ('.' not in s[ind_e+1:]) and ind_e>0 and ind_e<len(s)-1
+            return self.isNumber(s[0:ind_e]) and\
+                    self.isNumber(s[ind_e+1:]) and \
+                    ('.' not in s[ind_e+1:]) and \
+                    ind_e>0 and \
+                    ind_e<len(s)-1
 
         return True
 # 66 Plus one
@@ -5552,3 +5556,78 @@ class Solution(object):
         for i, char in enumerate(s):
             res += 26**(n-1-i)*dict[char]
         return res
+
+#172: factorial trailing zeroes:
+class Solution(object):
+    def trailingZeroes(self, n):
+        res = 0
+        base = 5
+        while base <= n:
+            res += n // base
+            base *= 5
+        return res
+
+import math
+class Solution:
+    def trailingZeroes(self, n):
+        assert n >= 0, n
+        zeros = 0
+        q = n
+
+        while q:
+            q //= 5
+            zeros += q
+        # print(zeros)
+        return zeros
+
+#173 Binary search tree iterator
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class BSTIterator(object):
+
+    def __init__(self, root):
+        """
+        :type root: TreeNode
+        """
+        self.root = root
+        self.all_nums = []
+        self.inorder_traversal(root)
+        self.current_idx = -1
+        self._len = len(self.all_nums)
+    def next(self):
+        """
+        @return the next smallest number
+        :rtype: int
+        """
+        self.current_idx += 1
+        return self.all_nums[self.current_idx]
+
+
+    def hasNext(self):
+        """
+        @return whether we have a next smallest number
+        :rtype: bool
+        """
+        return self.current_idx + 1  < self._len
+    def inorder_traversal(self, node):
+        """
+        perform inorder traversal of binary Tree
+        """
+        if node is None:
+            return
+        if node.left:
+            self.inorder_traversal(node.left)
+        self.all_nums.append(node.val)
+        if node.right:
+            self.inorder_traversal(node.right)
+
+
+# Your BSTIterator object will be instantiated and called as such:
+# obj = BSTIterator(root)
+# param_1 = obj.next()
+# param_2 = obj.hasNext()
