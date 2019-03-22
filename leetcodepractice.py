@@ -5631,3 +5631,246 @@ class BSTIterator(object):
 # obj = BSTIterator(root)
 # param_1 = obj.next()
 # param_2 = obj.hasNext()
+#174 Dungeon Game;
+class Solution:
+    def calculateMinimumHP(self, dungeon: List[List[int]]) -> int:
+        ''' This is a derterministic Markov Decision Process (MPD),
+            we can write the following Bellman Equation
+            V(i, j) = max(min(V(i + 1, j), V(i, j + 1)) - R(i, j), 1)
+            let V(i, j) be the minimum HP needed if starting from
+            position (i, j) and R(i,j) being the reward to be in
+            position (i, j), then we can write the above Bellman Equation,
+
+        '''
+        m = len(dungeon)
+        n = len(dungeon[0])
+        V = [[1 for j in range(n)] for i in range(m)]
+        V[m - 1][n - 1] = max(1 - dungeon[m - 1][n - 1], 1)
+        for i in range(m - 2, -1, -1):
+            V[i][n - 1] = max(V[i + 1][n - 1] - dungeon[i][n - 1], 1)
+        for j in range(n - 2, -1, -1):
+            V[m - 1][j] = max(V[m - 1][j + 1] - dungeon[m - 1][j], 1)
+        for i in range(m - 2, -1, -1):
+            for j in range(n - 2, -1, -1):
+                V[i][j] = max(min(V[i + 1][j], V[i][j + 1]) - dungeon[i][j], 1)
+        return V[0][0]
+
+#175: Combine two tables:
+# Write your MySQL query statement below
+SELECT Person.FirstName, Person.LastName, Address.City, Address.State
+FROM Person LEFT JOIN Address ON Person.PersonId =Address.PersonId
+
+#176 Second highest salary
+# Write your MySQL query statement below
+# Write your MySQL query statement below
+SELECT IFNULL((SELECT DISTINCT Salary
+               from Employee
+               Order by Salary DESC
+               LIMIT 1 OFFSET 1), NULL) As SecondHighestSalary
+
+#177 # getNthHighestSalary
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+    DECLARE M INT;
+    SET M=N-1;
+    RETURN (
+      # Write your MySQL query statement below.
+
+
+      SELECT DISTINCT Salary
+            FROM EMployee
+            ORDER BY Salary DESC
+            LIMIT 1 OFFSET M
+  );
+END
+
+#178 Rank Scores
+# First one uses two variables, one for the current rank
+# and one for the previous score.
+SELECT
+  Score,
+  @rank := @rank + (@prev <> (@prev := Score)) Rank
+FROM
+  Scores,
+  (SELECT @rank := 0, @prev := -1) init
+ORDER BY Score desc
+
+SELECT
+  Score,
+  (SELECT count(distinct Score) FROM Scores WHERE Score >= s.Score) Rank
+FROM Scores s
+ORDER BY Score desc
+
+SELECT
+  Score,
+  (SELECT count(*) FROM (SELECT distinct Score s FROM Scores) tmp WHERE s >= Score) Rank
+FROM Scores
+ORDER BY Score desc
+
+SELECT s.Score, count(distinct t.score) Rank
+FROM Scores s JOIN Scores t ON s.Score <= t.score
+GROUP BY s.Id
+ORDER BY s.Score desc
+
+#179 Largest number
+class LargerNumKey(str):
+    def __lt__(x, y):
+        return x+y > y+x
+
+class Solution(object):
+    def largestNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: str
+        """
+        num_sort = sorted(map(str, nums), key=LargerNumKey)
+        largest_num = ''.join(num_sort)
+        return '0' if largest_num[0] == '0' else largest_num
+
+
+#180 Consecutive Numbers:
+# Write your MySQL query statement below
+SELECT DISTINCT
+    l1.Num AS ConsecutiveNums
+FROM
+    Logs l1,
+    Logs l2,
+    Logs l3
+WHERE
+    l1.Id = l2.Id - 1
+    AND l2.Id = l3.Id - 1
+    AND l1.Num = l2.Num
+    AND l2.Num = l3.Num
+;
+
+select distinct num as consecutiveNums
+from (select num,sum(c) over (order by id) as flag from (select id, num, case when LAG(Num) OVER (order by id)- Num = 0 then 0 else 1 end as c
+from logs) a) b
+group by num,flag
+having count(*) >=3
+
+
+#181 Employees Earnign more than their managers
+# Write your MySQL query statement below
+Select
+    a.Name As 'Employee'
+From
+    Employee As a,
+    Employee As b
+Where
+    a.ManagerID = b.Id
+        AND a.Salary > b.Salary
+
+
+SELECT
+     a.NAME AS Employee
+FROM Employee AS a JOIN Employee AS b
+     ON a.ManagerId = b.Id
+     AND a.Salary > b.Salary
+
+#182 Duplicate email
+select Email from
+(
+  select Email, count(Email) as num
+  from Person
+  group by Email
+) as statistic
+where num > 1
+;
+
+select Email
+from Person
+group by Email
+having count(Email) > 1;
+
+#184: Department Highest Salary
+# Write your MySQL query statement below
+Select
+    Department.name As 'Department',
+    Employee.name As 'Employee',
+    Salary
+From
+    Employee
+        Join
+    Department ON Employee.DepartmentId = Department.Id
+WHERE
+    (Employee.DepartmentId, Salary) IN
+    (Select
+        DepartmentId, MAX(Salary)
+     FROM
+        Employee
+     GROUP BY DepartmentId
+    )
+
+#185: Department Top Three Salaries
+select tD.Name as 'Department', tE1.Name as 'Employee', tE1.Salary
+from Employee as tE1
+    Inner join Department as tD on tE1.DepartmentId = tD.Id
+    Left join Employee as tE2 on tE1.DepartmentId = tE2.DepartmentId and tE1.Salary <= tE2.Salary
+group by tE1.Id
+having count(distinct tE2.Salary) <= 3
+order by tE1.DepartmentId, tE1.Salary desc
+
+
+#187 Repeated DNA sequences:
+from collections import defaultdict, Counter
+class Solution(object):
+    def findRepeatedDnaSequences(self, s):
+        """
+        :type s: str
+        :rtype: List[str]
+        """
+        dict = defaultdict()
+        for i in range(len(s)-9):
+            sub = s[i:i+10]
+            if sub in dict:
+                dict[sub] += 1
+            else:
+                dict[sub] = 1
+        counter = Counter(dict)
+        res = [x for x in counter if counter[x]>1]
+        return res
+
+#188 Rotate array:
+class Solution(object):
+    def rotate(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        n = len(nums)
+        k = k%n
+        nums[:] = nums[n-k:n] + nums[0:n-k]
+
+#190 Reverse Bits
+class Solution:
+    # @param n, an integer
+    # @return an integer
+    def reverseBits(self, n):
+        string = bin(n)[2:].zfill(32)
+        resv = string[::-1]
+        res = int(resv,2)
+        return res
+
+#191 Number of 1 Bits
+from collections import Counter
+class Solution(object):
+    def hammingWeight(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        s = str(bin(n)[2:])
+
+        res = Counter([x for x in s])
+
+        return res['1']
+
+class Solutions(object):
+    def hammingWeight(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        return str(bin(n)).count('1')
