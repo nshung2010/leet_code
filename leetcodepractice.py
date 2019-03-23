@@ -5874,3 +5874,41 @@ class Solutions(object):
         :rtype: int
         """
         return str(bin(n)).count('1')
+
+# 196 Delete Duplicate Emails
+Delete p1 from Person p1, Person p2
+Where
+    p1.Email = p2.Email AND p1.Id > p2.Id
+
+
+# 197: Rising temperature
+# Write your MySQL query statement below
+SELECT
+    weather.id AS 'Id'
+FROM
+    weather
+        JOIN
+    weather w ON DATEDIFF(weather.RecordDate, w.RecordDate) = 1
+        AND weather.Temperature > w.Temperature
+;
+
+#198: House Robber
+class Solution(object):
+    def rob(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums:
+            return 0
+        n = len(nums)
+        if n==1:
+            return nums[0]
+        dp = [None]*n
+        dp[0] = nums[0]
+        dp[1] = max(nums[0], nums[1])
+        for i in range(2, len(nums)):
+            dp[i] = max(dp[i-1], dp[i-2] + nums[i])
+        return dp[-1]
+
+#199
