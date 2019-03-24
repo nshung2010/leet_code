@@ -4328,7 +4328,7 @@ class Solution(object):
             minimum = min(minimum, price)
         return profit
 
-#121 Best time to buy and sell stock II
+#122 Best time to buy and sell stock II
 class Solution(object):
     def maxProfit(self, prices):
         """
@@ -4437,6 +4437,37 @@ class Solution(object):
                 min_potential_lost[k] = min(min_potential_lost[k], prices[i] - dp[k-1])
                 dp[k] = max(dp[k], prices[i] - min_potential_lost[k])
         return dp[2]
+
+#188 Best time to buy and sell stock IV
+class Solution(object):
+    def maxProfit(self, k, prices):
+        """
+        :type k: int
+        :type prices: List[int]
+        :rtype: int
+        dynamic programing:
+        dp[k, i] = max(dp[k, i-1], prices[i] - (prices[j] - dp[k-1, j-1])) for j=0,..,i
+        need to find the min of (prices[j] - dp[k-1, j-1]) for all j < i
+        we name this min_potential_lost
+        """
+        if not prices:
+            return 0
+        n = len(prices)
+        if k>=n/2:
+            s=0
+            for i in range(1,n):
+                if prices[i]>prices[i-1]:
+                    s+=prices[i]-prices[i-1]
+            return s
+
+        dp=[None] * (k+1)
+        dp[0] = 0
+        min_potential_lost = [prices[0]] * (k+1)
+        for i in range(1, len(prices)):
+            for k in range(1, k+1):
+                min_potential_lost[k] = min(min_potential_lost[k], prices[i] - dp[k-1])
+                dp[k] = max(dp[k], prices[i] - min_potential_lost[k])
+        return dp[-1]
 
 #124: Binary Tree Maximum path Sum
 # Definition for a binary tree node.
@@ -4605,6 +4636,28 @@ class Solution(object):
                     board[r][c] = 'X'
                 elif board[r][c] == 'D':
                     board[r][c] = 'O'
+#200: Number of Islands:
+class Solution(object):
+    def numIslands(self, grid):
+        if not grid:
+            return 0
+
+        count = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == '1':
+                    self.dfs(grid, i, j)
+                    count += 1
+        return count
+
+    def dfs(self, grid, i, j):
+        if i<0 or j<0 or i>=len(grid) or j>=len(grid[0]) or grid[i][j] != '1':
+            return
+        grid[i][j] = '#'
+        self.dfs(grid, i+1, j)
+        self.dfs(grid, i-1, j)
+        self.dfs(grid, i, j+1)
+        self.dfs(grid, i, j-1)
 
 # 131 Palindrome partioning
 class Solution(object):
@@ -5744,7 +5797,8 @@ WHERE
 ;
 
 select distinct num as consecutiveNums
-from (select num,sum(c) over (order by id) as flag from (select id, num, case when LAG(Num) OVER (order by id)- Num = 0 then 0 else 1 end as c
+from (select num,sum(c) over (order by id) as flag
+    from (select id, num, case when LAG(Num) OVER (order by id)- Num = 0 then 0 else 1 end as c
 from logs) a) b
 group by num,flag
 having count(*) >=3
@@ -5911,4 +5965,143 @@ class Solution(object):
             dp[i] = max(dp[i-1], dp[i-2] + nums[i])
         return dp[-1]
 
-#199
+#199 Binary Tree Right Side View
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def rightSideView(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        if not root:
+            return []
+        rightmost_value_at_depth = dict() #depth -> node.val
+        max_depth = -1
+        stack = [(root, 0)]
+        while stack:
+            node, depth = stack.pop()
+            if node is not None:
+                #get the max_depth of the tree
+                max_depth = max(max_depth, depth)
+
+                #only insert into dict if depth is not already present
+                rightmost_value_at_depth.setdefault(depth, node.val)
+                stack.append((node.left, depth+1))
+                stack.append((node.right, depth+1))
+        return [rightmost_value_at_depth[depth] for depth in range(max_depth+1)]
+# Note: in this case, if we use stack we will implement DFS; if we use
+# queue, we will implement BFS
+
+#201 Bitwise AND of Numbers Range
+"""
+The hardest part of this problem is to find the regular pattern.
+For example, for number 26 to 30
+Their binary form are:
+11010
+11011
+11100　　
+11101　　
+11110
+
+Because we are trying to find bitwise AND, so if any bit there are at least one 0 and one 1, it always 0. In this case, it is 11000.
+So we are go to cut all these bit that they are different. In this case we cut the right 3 bit.
+
+I think after understand this, the code is trivial:
+"""
+class Solution(object):
+    def rangeBitwiseAnd(self, m, n):
+        """
+        :type m: int
+        :type n: int
+        :rtype: int
+        """
+        i = 0 # i means we have how many bits are 0 on the right
+        while m != n:
+            m >>= 1
+            n >>= 1
+            i += 1
+        return m << i
+
+# 202 Happy number
+class Solution(object):
+    def isHappy(self, n):
+        """
+        :type n: int
+        :rtype: bool
+        """
+        i = 0
+        memo = {}
+        while n != 1:
+            temp = self.sum_square_digits(n)
+            memo[n] = temp
+            n = temp
+            if n in memo:
+                return False
+        return True
+    def sum_square_digits(self, x):
+        str_x = str(x)
+        str_x_digits = [int(c)**2 for c in str_x]
+        return sum(str_x_digits)
+# 203 Remove linked list elements
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def removeElements(self, head, val):
+        """
+        :type head: ListNode
+        :type val: int
+        :rtype: ListNode
+        """
+        dummy = ListNode(0)
+        dummy.next = head
+        pre, cur = dummy, head
+        while cur:
+            if cur.val == val:
+                while cur and cur.val ==val:
+                    cur = cur.next
+                pre.next = cur
+            pre = pre.next
+            if cur:
+                cur = cur.next
+        return dummy.next
+
+#204 Count primes:
+def countPrimes(self, n):
+        if n < 3:
+            return 0
+        primes = [True] * n
+        primes[0] = primes[1] = False
+        for i in range(2, int(n ** 0.5) + 1):
+            if primes[i]:
+                primes[i * i: n: i] = [False] * len(primes[i * i: n: i])
+        return sum(primes)
+
+#205: Isomorphic Strings:
+class Solution(object):
+    def isIsomorphic(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: bool
+        """
+        if len(s) != len(t):
+            return False
+        mapping = dict()
+        for i, ch in enumerate(s):
+            if ch not in mapping:
+                if t[i] in mapping.values():
+                    return False
+                mapping.setdefault(ch, t[i])
+            elif mapping[ch] != t[i]:
+                return False
+        return True
