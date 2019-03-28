@@ -1,1 +1,2 @@
-print(4 >> 1)
+a = ['s', 'b']
+print('s' in a)

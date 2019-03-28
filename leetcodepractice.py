@@ -6105,3 +6105,63 @@ class Solution(object):
             elif mapping[ch] != t[i]:
                 return False
         return True
+
+#207: Course Schedule:
+"""
+This is topological sorting.
+https://en.wikipedia.org/wiki/Topological_sorting#Kahn.27s_algorithm
+
+"""
+# Sol1 based on dfs:
+class Solution(object):
+    def canFinish(self, numCourses, prerequisites):
+        """
+        :type numCourses: int
+        :type prerequisites: List[List[int]]
+        :rtype: bool
+        """
+        graph = [[] for _ in range(numCourses)]
+        visit = [0] * numCourses
+        for course, pre in prerequisites:
+            graph[course].append(pre)
+
+        def visit_dfs(i):
+            if visit[i] == -1:
+                return False
+            if visit[i] == 1:
+                return True
+            visit[i] = -1
+            for course in graph[i]:
+                if not visit_dfs(course):
+                    return False
+            visit[i] = 1
+            return True
+
+        for i in range(numCourses):
+            if not visit_dfs(i):
+                return False
+        return True
+# Sol2 based on Kahn's algorithm:
+class Solution(object):
+    def canFinish(self, numCourses, prerequisites):
+        """
+        :type numCourses: int
+        :type prerequisites: List[List[int]]
+        :rtype: bool
+        """
+        graph = {i: set() for i in range(numCourses)}
+        indeg = {i: 0 for i in range(numCourses)}
+        for s, e in prerequisites:
+            graph[s] |= {e}
+            indeg[e] += 1
+        queue = [i for i in range(numCourses) if indeg[i] == 0]
+        visits = set(queue)
+        for node in queue:
+            for neigh in graph[node]:
+                if neigh in visits:
+                    return False
+                indeg[neigh] -= 1
+                if indeg[neigh] == 0:
+                    visits.add(neigh)
+                    queue.append(neigh)
+        return len(visits) == numCourses
