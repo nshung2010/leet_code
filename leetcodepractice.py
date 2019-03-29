@@ -6165,3 +6165,128 @@ class Solution(object):
                     visits.add(neigh)
                     queue.append(neigh)
         return len(visits) == numCourses
+
+# 208 Implement Trie (Prefix Tree)
+class TrieNode(object):
+    def __init__(self):
+        self.children = [None]*26
+        self.is_end_word = False
+
+class Trie(object):
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.root = TrieNode()
+
+    def _char_to_index(self, ch):
+        """
+        private helper function to
+        convert key current character
+        into index. Assume only use 'a'
+        through 'z' and lower case
+        """
+        return ord(ch) - ord('a')
+
+    def insert(self, word):
+        """
+        Inserts a word into the trie.
+        :type word: str
+        :rtype: None
+        """
+        pointer = self.root
+        length = len(word)
+        for level in range(length):
+            index = self._char_to_index(word[level])
+            # if current character is not present:
+            if pointer.children[index] is None:
+                pointer.children[index] = TrieNode()
+            pointer = pointer.children[index]
+        # mark last node as leaf
+        pointer.is_end_word = True
+
+
+
+    def search(self, word):
+        """
+        Returns if the word is in the trie.
+        :type word: str
+        :rtype: bool
+        """
+        pointer = self.root
+        length = len(word)
+        for level in range(length):
+            index = self._char_to_index(word[level])
+            # if current character is not present:
+            if pointer.children[index] is None:
+                return False
+            pointer = pointer.children[index]
+        return pointer != None and pointer.is_end_word
+
+
+    def startsWith(self, prefix):
+        """
+        Returns if there is any word in the trie that starts with the given prefix.
+        :type prefix: str
+        :rtype: bool
+        """
+        pointer = self.root
+        length = len(prefix)
+        for level in range(length):
+            index = self._char_to_index(prefix[level])
+            # if current character is not present:
+            if pointer.children[index] is None:
+                return False
+            pointer = pointer.children[index]
+        return True
+
+# 209. Minimum size subarray sum:
+class Solution(object):
+    def minSubArrayLen(self, s, nums):
+        """
+        :type s: int
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums:
+            return 0
+        ans = float('inf')
+        left, sums = 0, 0
+        for i in range(len(nums)):
+            sums += nums[i]
+            while sums >= s:
+                ans = min(ans, i+1-left)
+                sums -= nums[left]
+                left += 1
+        return ans if ans != float('inf') else 0
+
+
+#210: Course Schedule II
+class Solution(object):
+    def findOrder(self, numCourses, prerequisites):
+        """
+        :type numCourses: int
+        :type prerequisites: List[List[int]]
+        :rtype: List[int]
+        """
+        graph = {i: set() for i in range(numCourses)}
+        in_coming_edge = {i: 0 for i in range(numCourses)}
+        visit = [0] * numCourses
+        for course, pre_req in prerequisites:
+            graph[course] |= {pre_req}
+            in_coming_edge[pre_req] += 1
+        outside_edge = [i for i in range(numCourses) if in_coming_edge[i] == 0]
+        visits = set(outside_edge)
+        course_ordered = []
+        while outside_edge:
+            temp_course = outside_edge.pop()
+            for neigh in graph[temp_course]:
+                if neigh in visits:
+                    return []
+                in_coming_edge[neigh] -= 1
+                if in_coming_edge[neigh] == 0:
+                    outside_edge.append(neigh)
+                    visits.add(neigh)
+            course_ordered.append(temp_course)
+        return course_ordered[::-1] if len(course_ordered) == numCourses else []
