@@ -6290,3 +6290,147 @@ class Solution(object):
                     visits.add(neigh)
             course_ordered.append(temp_course)
         return course_ordered[::-1] if len(course_ordered) == numCourses else []
+
+# Sol 2: DFS
+class Solution(object):
+    def findOrder(self, numCourses, prerequisites):
+        """
+        :type numCourses: int
+        :type prerequisites: List[List[int]]
+        :rtype: List[int]
+        """
+        graph = {i: set() for i in range(numCourses)}
+        visit = [0] * numCourses
+
+        for s, e in prerequisites:
+            graph[s] |= {e}
+
+
+        course_ordered = []
+
+        def dfs_visit(course):
+            # print(course)
+            if visit[course] == 1:
+                return True
+            if visit[course] == -1:
+                # is_possible = False
+                return False
+
+            visit[course] = -1
+            if course in graph:
+                for node in graph[course]:
+                    if not dfs_visit(node):
+                        return False
+            visit[course] = 1
+            course_ordered.append(course)
+            # print(course_ordered)
+            return True
+        for course in range(numCourses):
+            if visit[course] == 0:
+                if not dfs_visit(course):
+                    return []
+        return course_ordered if len(course_ordered) == numCourses else []
+
+
+# 211 Add and search word - data structure design
+class TrieNode(object):
+    def __init__(self):
+        self.children = [None]*26
+        self.is_end_word = False
+
+class WordDictionary(object):
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.root = TrieNode()
+
+    def _char_to_index(self, ch):
+        """
+        private helper function to
+        convert key current character
+        into index. Assume only use 'a'
+        through 'z' and lower case
+        """
+        return ord(ch) - ord('a')
+
+    def addWord(self, word):
+        """
+        Adds a word into the data structure.
+        :type word: str
+        :rtype: None
+        """
+        pointer = self.root
+        length = len(word)
+        for level in range(length):
+            idx = self._char_to_index(word[level])
+            if pointer.children[idx] is None:
+                pointer.children[idx] = TrieNode()
+            pointer = pointer.children[idx]
+        pointer.is_end_word = True
+
+    def search(self, word):
+        """
+        Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter.
+        :type word: str
+        :rtype: bool
+        """
+        def find_word(trie_node, word):
+            if trie_node is None:
+                return False
+            if not word:
+                return trie_node.is_end_word
+            if word[0] == '.':
+                for child in trie_node.children:
+                    if find_word(child, word[1:]):
+                        return True
+                return False
+            else:
+                index = self._char_to_index(word[0])
+                child = trie_node.children[index]
+
+                return find_word(child, word[1:])
+                #return False
+
+        return find_word(self.root, word)
+
+class WordDictionary(object):
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.val = False
+        self.child = {}
+
+
+    def addWord(self, word):
+        """
+        Adds a word into the data structure.
+        :type word: str
+        :rtype: None
+        """
+        cur = self
+        for c in word:
+            if c not in cur.child:
+                cur.child[c] = WordDictionary()
+            cur = cur.child[c]
+        cur.val = True
+
+
+    def search(self, word):
+        """
+        Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter.
+        :type word: str
+        :rtype: bool
+        """
+        stack,n = [(self,0)],len(word)
+        while stack:
+            cur,depth = stack.pop(0)
+            if depth >= n: return False
+            for k in cur.child:
+                if k == word[depth] or word[depth] == ".":
+                    stack.append((cur.child[k],depth+1))
+                    if depth == n-1 and cur.child[k].val: return True
+        return False
