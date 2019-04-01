@@ -2051,7 +2051,6 @@ class Solution(object):
 
 
 
-
 class Solution(object):
     def solveNQueens(self, n):
         res = []
@@ -2999,6 +2998,7 @@ class Solution(object):
                 return True
             self.checked[(start_row, start_col)] = False
         return False
+
 
 # 80 remove duplicates from sorted array
 class Solution:
@@ -6434,3 +6434,137 @@ class WordDictionary(object):
                     stack.append((cur.child[k],depth+1))
                     if depth == n-1 and cur.child[k].val: return True
         return False
+
+
+#212 Word search II:
+# This solution is just an improvement of Word search I (Q79), however
+# it will give LTE(Limit time error) because it takes a lot of time
+# to re-checked the word with similar prefix. We must use Trie() to get
+# away with that
+class Solution(object):
+    def findWords(self, board, words):
+        """
+        :type board: List[List[str]]
+        :type words: List[str]
+        :rtype: List[str]
+        """
+        self.board = board
+        self.n_row = len(self.board)
+        self.n_col = len(self.board[0])
+        self.visit = [[0]*self.n_col for _ in range(self.n_row)]
+        res = []
+        for row in range(self.n_row):
+            for col in range(self.n_col):
+                char = self.board[row][col]
+                for word in words:
+                    if word[0]==char and word not in res:
+                        if self.find_word(row, col, word, 0):
+                            res.append(word)
+        return res
+
+    def find_word(self, row, col, word, k):
+        if k>len(word)-1:
+            return True
+        if row < 0 or row > self.n_row-1 or col<0 or col>self.n_col-1:
+            return False
+        if self.board[row][col] != word[k]:
+            return False
+
+        if self.visit[row][col] == 0:
+            self.visit[row][col] = 1
+
+            if self.find_word(row-1, col, word, k+1) or self.find_word(row+1, col, word, k+1) or \
+                self.find_word(row, col-1, word, k+1) or self.find_word(row, col+1, word, k+1):
+                self.visit[row][col] = 0
+                return True
+            self.visit[row][col] = 0
+        return False
+
+# using Trie()
+class TrieNode(object):
+    def __init__(self):
+        self.word = None
+        self.children = {}
+
+class Trie(object):
+    def __init__(self):
+        self.root = TrieNode()
+    def insert(self, word):
+        pointer = self.root
+        for char in word:
+            if char not in pointer.children:
+                pointer.children[char] = TrieNode()
+            pointer = pointer.children[char]
+        pointer.word = word
+
+class Solution(object):
+    def search(self, row, col, root, board, n_row, n_col, res):
+        """
+        helper function to search word from row and col in board. the
+        word is in the Trie (root). When the word is end (i.e. root.word
+        is not None), root.word will be added to res
+        """
+        char = board[row][col]
+        if not (char and char in root.children):
+            return
+        board[row][col], root = None, root.children[char]
+        if root.word:
+            res.append(root.word)
+            root.word = None # removed it
+
+        for x, y in ((0, -1), (-1, 0), (0, 1), (1, 0)):
+            neigh_row, neigh_col = row +x, col + y
+            if 0<= neigh_row < n_row and 0<=neigh_col<n_col:
+                self.search(neigh_row, neigh_col, root, board, n_row, n_col, res)
+
+        board[row][col] = char
+
+    def findWords(self, board, words):
+        if not board:
+            return []
+        trie = Trie()
+        for word in words:
+            trie.insert(word)
+        res = []
+        n_row = len(board)
+        n_col = len(board[0])
+        for row in range(n_row):
+            for col in range(n_col):
+                self.search(row, col, trie.root, board, n_row, n_col, res)
+        return res
+
+# 980 Unique Paths III:
+class Solution(object):
+    def uniquePathsIII(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        """
+        if not grid:
+            return 0
+        n_row = len(grid)
+        n_col = len(grid[0])
+        self.number_visited_need = 0
+        for row in range(n_row):
+            for col in range(n_col):
+                if grid[row][col] == 1:
+                    start_row, start_col = row, col
+                elif grid[row][col] == 0:
+                    self.number_visited_need += 1
+        # print(self.number_visited_need)
+        self.res = 0
+        def find_path(r, c, visit):
+            # print(r, c, visit)
+            if grid[r][c] == 2:
+                #print(visit, self.number_visited_need)
+                if visit == self.number_visited_need+2:
+                    self.res += 1
+                return
+            grid[r][c] = -1
+            for nr, nc in [(r, c-1), (r, c+1), (r-1, c), (r+1, c)]:
+                if 0<=nr<n_row and 0<=nc<n_col and grid[nr][nc] % 2 == 0:
+                    find_path(nr, nc, visit+1)
+            grid[r][c] = 0
+        # grid[start_row][start_col] = -1
+        find_path(start_row, start_col, 1)
+        return self.res
