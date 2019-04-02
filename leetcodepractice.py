@@ -5964,6 +5964,37 @@ class Solution(object):
         for i in range(2, len(nums)):
             dp[i] = max(dp[i-1], dp[i-2] + nums[i])
         return dp[-1]
+# 213 House Robber II
+class Solution(object):
+    def rob(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums:
+            return 0
+
+        n = len(nums)
+        if n==1:
+            return nums[0]
+        if n==2:
+            return max(nums[0], nums[1])
+        #nums = nums + [nums[0]]
+        nums_1 = nums[0:n-1]
+        nums_2 = nums[1:n]
+        return max(self.rob_original(nums_1), self.rob_original(nums_2))
+    def rob_original(self, nums):
+        if not nums:
+            return 0
+        n = len(nums)
+        if n==1:
+            return nums[0]
+        dp=[None]*n
+        dp[0] = nums[0]
+        dp[1] = max(nums[0], nums[1])
+        for i in range(2, len(nums)):
+            dp[i] = max(dp[i-1], dp[i-2]+nums[i])
+        return dp[-1]
 
 #199 Binary Tree Right Side View
 # Definition for a binary tree node.
@@ -6568,3 +6599,48 @@ class Solution(object):
         # grid[start_row][start_col] = -1
         find_path(start_row, start_col, 1)
         return self.res
+
+# 215 Kth Largest element in an array:
+
+class Solution(object):
+    def findKthLargest(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        heap = []
+        for num in nums:
+            heapq.heappush(heap, -num)
+        for _ in range(k-1):
+            heapq.heappop(heap)
+        return -heapq.heappop(heap)
+
+# 216 Combination Sum III:
+class Solution(object):
+    def combinationSum3(self, k, n):
+        """
+        :type k: int
+        :type n: int
+        :rtype: List[List[int]]
+        """
+        nums = [i for i in range(1, 10)]
+
+        return self.combination_sum(k, n, nums)
+
+    def combination_sum(self, k, n, nums):
+        if k>len(nums) or sum(nums[-k:])<n or not nums:
+            return []
+        if k==1:
+            if n in nums:
+                return [[n]]
+            else:
+                return []
+        res = []
+        for i, num in enumerate(nums):
+            # temp_nums = numsnums[i+1:]
+            # print(temp_nums)
+            remain = self.combination_sum(k-1, n-num, nums[i+1:])
+            for x in remain:
+                res.append([num] + x)
+        return res
