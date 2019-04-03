@@ -6644,3 +6644,50 @@ class Solution(object):
             for x in remain:
                 res.append([num] + x)
         return res
+
+#214 Shortest Palindrome
+class Solution(object):
+    def shortestPalindrome(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        if not s:
+            return ''
+
+        reverse = s[::-1]
+
+        for i in range(len(reverse)):
+            if s.startswith(reverse[i:]):
+                return reverse[:i] + s
+
+#sol 2 is related to KMP failure function
+# KMP is findung the longest prefix that is also suffix
+# KMP algorithm:
+class Solution(object):
+    def shortestPalindrome(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        new_s =  s + '#' + s[::-1]
+        fail = self.compute_kmp_fail(new_s)
+        i = fail[-1]
+        return s[i:][::-1] + s
+
+
+    def compute_kmp_fail(self, s):
+        k = 0
+        j = 1
+        m = len(s)
+        fail = [0]*m
+        while j<m:
+            if s[j] == s[k]:
+                fail[j] = k+1
+                j += 1
+                k += 1
+            elif k>0:
+                k = fail[k-1]
+            else:
+                j += 1
+        return fail
