@@ -6691,3 +6691,81 @@ class Solution(object):
             else:
                 j += 1
         return fail
+
+# 219 Contains DupblicateII
+class Solution(object):
+    def containsNearbyDuplicate(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: bool
+        """
+        if len(set(nums))==len(nums):
+            return False
+        duplicate_list = {}
+        for i, num in enumerate(nums):
+            if num not in duplicate_list:
+                duplicate_list[num] = i
+            else:
+                distance = i - duplicate_list[num]
+                duplicate_list[num] = i
+                if distance <= k:
+                    return True
+        return False
+# 220 Contains dubplicate III
+class Solution(object):
+    def containsNearbyAlmostDuplicate(self, nums, k, t):
+        """
+        :type nums: List[int]
+        :type k: int
+        :type t: int
+        :rtype: bool
+        """
+        # moving each number in nums into buckets of size t
+        # maintain maximum number of buckets is k to make sure
+        # the difference in index is k
+        bucket = {}
+        for i, num in enumerate(nums):
+            # get which bucket it is in:
+            buck_num = num//t if t!=0 else num
+            # get the offset bucket which typical is 1
+            # i.e. the no candidates must be in the same bucket
+            # or two adjunct bucket. if t==0, we only check in the same bucket
+            offset = 1 if t!=0 else 0
+            for idx in range(buck_num-offset, buck_num+offset+1):
+                if idx in bucket and abs(bucket[idx] - num) <= t:
+                    return True
+            bucket[buck_num] = num
+            if len(bucket.keys()) > k:
+                # remove the bucket associate with nums[i-k]
+                # again we determin the buck_num for nums[i-k]
+                # equal nums[i-k]//t or nums[i-k] if t==0
+                buck_num_of_nums_i_k = nums[i-k] //t if t!=0 else nums[i-k]
+                del bucket[buck_num_of_nums_i_k]
+        return False
+
+# 221 Maximum square:
+class Solution(object):
+    def maximalSquare(self, matrix):
+        """
+        :type matrix: List[List[str]]
+        :rtype: int
+        """
+        if not matrix:
+            return 0
+        n_row = len(matrix)
+        n_col = len(matrix[0])
+        dp = [[0]*n_col for _ in range(n_row)]
+        max_len = 0
+        for i in range(n_row):
+            for j in range(n_col):
+                if matrix[i][j] == '1':
+                    # print(i, j)
+                    if i==0 or j==0:
+                        dp[i][j] = 1
+                    else:
+                        dp[i][j] = min(dp[i-1][j], dp[i-1][j-1],dp[i][j-1]) + 1
+
+                    max_len = max(max_len, dp[i][j])
+
+        return max_len*max_len
