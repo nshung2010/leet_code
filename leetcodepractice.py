@@ -6769,3 +6769,56 @@ class Solution(object):
                     max_len = max(max_len, dp[i][j])
 
         return max_len*max_len
+
+# 222 count complete tree nodes:
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def countNodes(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if not root:
+            return 0
+        stack = [root]
+        number_node = 0
+        while stack:
+            node = stack.pop()
+            if node:
+                number_node += 1
+            if node.left:
+                stack.append(node.left)
+            if node.right:
+                stack.append(node.right)
+        return number_node
+
+#223 Rectangle area
+class Solution(object):
+    def computeArea(self, A, B, C, D, E, F, G, H):
+        """
+        :type A: int
+        :type B: int
+        :type C: int
+        :type D: int
+        :type E: int
+        :type F: int
+        :type G: int
+        :type H: int
+        :rtype: int
+        """
+
+        left_corner_x = max(A, E)
+        right_corner_x = min(C, G)
+        left_corner_y = max(B, F)
+        right_corner_y = min(D, H)
+        area_1 = (C-A)*(D-B)
+        area_2 = (G-E)*(H-F)
+        if C<E or G<A or H<B or D<F:
+            return area_1 + area_2
+        return area_1+area_2-(right_corner_x - left_corner_x)*(right_corner_y - left_corner_y)
