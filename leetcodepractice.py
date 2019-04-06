@@ -6822,3 +6822,112 @@ class Solution(object):
         if C<E or G<A or H<B or D<F:
             return area_1 + area_2
         return area_1+area_2-(right_corner_x - left_corner_x)*(right_corner_y - left_corner_y)
+
+
+#218: The Skyline Problem:
+from heapq import heappush, heappop
+class Solution(object):
+    def getSkyline(self, buildings):
+        """
+        :type buildings: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        critical_points =  [(L, -H, R) for L, R, H in buildings]
+        critical_points += [(R, 0, 0) for _, R, _ in buildings]
+        critical_points.sort()
+
+        live_height = [(0, float('inf'))]
+        res = [[0, 0]]
+
+        for cur_pos, neg_h, cur_r in critical_points:
+            while cur_pos >= live_height[0][1]:
+                heappop(live_height)
+            if neg_h:
+                heappush(live_height, (neg_h, cur_r))
+            if res[-1][1] != -live_height[0][0]:
+                res.append([cur_pos, -live_height[0][0]])
+        return res[1:]
+
+# 225 implement stack using queues
+class MyStack(object):
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self._data_1 = []
+        self._data_2 = []
+        self._top_num = None
+
+    def push(self, x):
+        """
+        Push element x onto stack.
+        :type x: int
+        :rtype: None
+        """
+        self._data_1.append(x)
+        self._top_num = x
+
+    def pop(self):
+        """
+        Removes the element on top of the stack and returns that element.
+        :rtype: int
+        """
+        if self._data_2:
+            for _ in range(len(self._data_2)-1):
+                self._top_num = self._data_2.pop(0)
+                self._data_1.append(self._top_num)
+            return self._data_2.pop(0)
+        else:
+            for _ in range(len(self._data_1)-1):
+                self._top_num = self._data_1.pop(0)
+                self._data_2.append(self._top_num)
+            return self._data_1.pop(0)
+
+    def top(self):
+        """
+        Get the top element.
+        :rtype: int
+        """
+        return self._top_num
+
+    def empty(self):
+        """
+        Returns whether the stack is empty.
+        :rtype: bool
+        """
+        return self._data_1 == [] and self._data_2 == []
+
+
+# Your MyStack object will be instantiated and called as such:
+# obj = MyStack()
+# obj.push(x)
+# param_2 = obj.pop()
+# param_3 = obj.top()
+# param_4 = obj.empty()
+
+#224 basic calculator
+class Solution(object):
+    def calculate(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        res, num, sign, stack = 0, 0, 1, []
+        for ss in s:
+            if ss.isdigit():
+                num = 10*num + int(ss)
+            elif ss in ["-", "+"]:
+                res += sign*num
+                num = 0
+                sign = -1 if ss == '-' else 1
+            elif ss == "(":
+                stack.append(res)
+                stack.append(sign)
+                sign, res = 1, 0
+            elif ss == ")":
+                res += sign*num
+                res *= stack.pop()
+                res += stack.pop()
+                num = 0
+        return res + num*sign
