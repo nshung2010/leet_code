@@ -6931,3 +6931,519 @@ class Solution(object):
                 res += stack.pop()
                 num = 0
         return res + num*sign
+
+#226 Invert Binary Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def invertTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: TreeNode
+        """
+        if not root:
+            return None
+        left = root.left if root.left else None
+        right = root.right if root.right else None
+
+        self.invertTree(left)
+        self.invertTree(right)
+        root.left, root.right = right, left
+        return root
+
+# 227 Basic alculator II
+class Solution(object):
+    def calculate(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        pos = [0]
+        sign = [1]
+        stack = []
+        for i, ch in enumerate(s):
+            if ch in '+-':
+                temp_sign = -1 if ch=='-' else 1
+                sign.append(temp_sign)
+                if pos[-1] < len(s):
+                    stack.append(s[pos[-1]:i])
+                pos.append(i+1)
+        if pos[-1] < len(s):
+            stack.append(s[pos[-1]:len(s)])
+        # print(sign, stack)
+        res = 0
+        for sign_temp, exp in zip(sign, stack):
+            #print(sign_temp, exp)
+            res += sign_temp*(self.calculate_multiply_division_only(exp))
+        return res
+    def calculate_multiply_division_only(self, exp):
+        stack = []
+        num = 0
+        for ch in exp:
+            if ch.isdigit():
+                num = num*10 + int(ch)
+            elif ch in '*/':
+                stack.append(num)
+                stack.append(ch)
+                num = 0
+        stack.append(num)
+        stack = stack[::-1]
+        # print(stack)
+        res = stack.pop()
+        while stack:
+            operation = stack.pop()
+            num = stack.pop()
+            if operation == '*':
+                res = res * num
+            elif operation == '/':
+                res = res//num
+        return res
+
+# best solution:
+class Solution(object):
+    def calculate(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        pre, cur = 0, 0
+        op = '+'
+        num = 0
+        for i, ch in enumerate(s):
+            if ch.isdigit():
+                num = num*10 + int(ch)
+            if ch in '+-*/' or i==len(s)-1:
+                if op == '+':
+                    pre, cur = pre+cur, num
+                elif op == '-':
+                    pre, cur = pre+cur, -num
+                elif op == '*':
+                    cur *= num
+                elif op == '/':
+                    if cur<0:
+                        cur = -(-cur//num)
+                    else:
+                        cur = cur//num
+                op = ch
+                num = 0
+                # print(pre, cur, num)
+        return pre+cur
+
+#228: summary ranges:
+class Solution(object):
+    def summaryRanges(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[str]
+        """
+        if not nums:
+            return []
+        res = []
+        left = nums[0]
+        right = None
+        i = 1
+        n = len(nums)
+        cur = left
+        while i<n:
+            if nums[i] == cur+1:
+                cur = nums[i]
+            else:
+                right=nums[i-1]
+                if left == right:
+                    res.append(str(left))
+                else:
+                    res.append(str(left) + '->' + str(right))
+                left = nums[i]
+                cur = left
+                right = None
+            i += 1
+        if left == cur:
+            res.append(str(left))
+        else:
+            res.append(str(left) + '->' + str(cur))
+        return res
+
+class Solution(object):
+    def summaryRanges(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[str]
+        """
+
+        start, end, i, result  = 0, 0, 1, []
+
+        while i < len(nums) + 1 :
+            if i != len(nums) and nums[end] + 1 == nums[i] :
+                end = i
+            else :
+                if start == end :
+                    s = str(nums[start])
+                else :
+                    s = str(nums[start]) + "->" + str(nums[end])
+
+                start, end = i, i
+                result.append(s)
+            i += 1
+
+        return result
+
+# 229: Majority element II
+class Solution(object):
+    def summaryRanges(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[str]
+        """
+
+        start, end, i, result  = 0, 0, 1, []
+
+        while i < len(nums) + 1 :
+            if i != len(nums) and nums[end] + 1 == nums[i] :
+                end = i
+            else :
+                if start == end :
+                    s = str(nums[start])
+                else :
+                    s = str(nums[start]) + "->" + str(nums[end])
+
+                start, end = i, i
+                result.append(s)
+            i += 1
+
+        return result
+# 229 Majority Element II
+# This is Boyer-Moore majority vote algorithm to solve it in O(1) space
+class Solution(object):
+    def majorityElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        candidate_1, candidate_2 = 0, 0
+        count_1, count_2 = 0, 0
+        for x in nums:
+            if x == candidate_1:
+                count_1 += 1
+            elif x == candidate_2:
+                count_2 += 1
+            elif count_1 ==0:
+                candidate_1 = x
+                count_1 = 1
+            elif count_2 == 0:
+                candidate_2 = x
+                count_2 = 1
+
+            else:
+                count_1 -= 1
+                count_2 -= 1
+        # second loof to confirm:
+        # print(candidate_1, candidate_2)
+        res = []
+        count_1, count_2 = 0, 0
+        for x in nums:
+            if x == candidate_1:
+                count_1 += 1
+            if x == candidate_2:
+                count_2 += 1
+        if count_1 > len(nums)//3:
+            res.append(candidate_1)
+
+        if count_2 > len(nums) //3 and candidate_2!= candidate_1:
+            res.append(candidate_2)
+        return res
+# solution for O(n) space:
+class Solution(object):
+    def majorityElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        res = {}
+        for num in nums:
+            if num in res:
+                res[num] += 1
+            else:
+                res[num] = 1
+        return [x for x in res if res[x] > (len(nums)//3)]
+# 230 find kth smallest values in a BST
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def kthSmallest(self, root, k):
+        """
+        :type root: TreeNode
+        :type k: int
+        :rtype: int
+        """
+        stack = [root]
+
+        while stack[-1].left:
+            stack.append(stack[-1].left)
+
+        while stack:
+            temp = stack.pop()
+            k -=1
+            if k ==0:
+                return temp.val
+
+            right = temp.right
+            while right:
+                stack.append(right)
+                right = right.left
+        return False
+
+# Sol 2: InOrderTraversal
+class Solution(object):
+
+    def doInOrderTraversal(self, node):
+        if not node or self.result:
+            return
+        self.doInOrderTraversal(node.left)
+        self.nodeArray.append(node.val)
+        if len(self.nodeArray) == self.limit:
+            self.result = self.nodeArray[-1]
+            return
+        self.doInOrderTraversal(node.right)
+
+    def kthSmallest(self, root, k):
+        """
+        :type root: TreeNode
+        :type k: int
+        :rtype: int
+        """
+        self.nodeArray = []
+        self.result= None
+        self.limit = k
+        self.doInOrderTraversal(root)
+        if not self.nodeArray:
+            return None
+        return self.result
+# 231 Power of Two:
+class Solution(object):
+    def isPowerOfTwo(self, n):
+        """
+        :type n: int
+        :rtype: bool
+        """
+        if n<=0:
+            return False
+        if n==1:
+            return True
+        elif n % 2 == 1:
+            return False
+        elif int(n**0.5) == n**0.5:
+            return self.isPowerOfTwo(n**0.5)
+        elif int((n/2)**0.5) == (n/2)**0.5:
+            return self.isPowerOfTwo((n/2)**0.5)
+        else:
+            return False
+
+class Solution(object):
+    def isPowerOfTwo(self, n):
+        """
+        :type n: int
+        :rtype: bool
+        """
+        return n>0 and n&(n-1) == 0
+
+# Implement Queue using stacks:
+class MyQueue(object):
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self._stack_1 = []
+        self._stack_2 = []
+        self._front_element = None
+    def push(self, x):
+        """
+        Push element x to the back of queue.
+        :type x: int
+        :rtype: None
+        """
+        if len(self._stack_1) == 0:
+            self._front_element = x
+        self._stack_1.append(x)
+
+
+    def pop(self):
+        """
+        Removes the element from in front of queue and returns that element.
+        :rtype: int
+        """
+        if len(self._stack_2)==0:
+
+            while self._stack_1:
+                self._stack_2.append(self._stack_1.pop())
+        return self._stack_2.pop()
+
+    def peek(self):
+        """
+        Get the front element.
+        :rtype: int
+        """
+        if len(self._stack_2) != 0:
+            return self._stack_2[-1]
+        return self._front_element
+
+    def empty(self):
+        """
+        Returns whether the queue is empty.
+        :rtype: bool
+        """
+        return len(self._stack_1) == 0 and len(self._stack_2) ==0
+
+
+# Your MyQueue object will be instantiated and called as such:
+# obj = MyQueue()
+# obj.push(x)
+# param_2 = obj.pop()
+# param_3 = obj.peek()
+# param_4 = obj.empty()
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+# Palindrome linked list
+class Solution(object):
+    def isPalindrome(self, head):
+        """
+        :type head: ListNode
+        :rtype: bool
+        """
+        if not head:
+            return True
+        n = 0
+        temp = head
+        while temp:
+            n += 1
+            temp = temp.next
+        second_half = head
+        for _ in range(n//2-1):
+            second_half = second_half.next
+        temp = second_half.next
+        second_half.next = None
+        reverse = self.reverse_link_list(temp)
+        #print(reverse.val)
+        #print(head.val)
+        if reverse is None:
+            return True
+        for _ in range(n//2):
+            if head.val != reverse.val:
+                return False
+            head = head.next
+            reverse = reverse.next
+        return True
+
+    def reverse_link_list(self, head):
+        if not head:
+            return None
+        reverse, cur = None, head
+        while cur.next:
+            temp = cur.next
+            cur.next = reverse
+            reverse = cur
+            cur = temp
+        cur.next = reverse
+        return cur
+
+def isPalindrome(self, head):
+        def reverse(node):
+            prev = None
+            curr = node
+            next = None
+            while curr:
+                next = curr.next
+                curr.next = prev
+                prev = curr
+                curr = next
+            return prev
+
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        mid_rev = reverse(slow)
+        start = head
+        while mid_rev:
+            if start.val != mid_rev.val:
+                return False
+            start = start.next
+            mid_rev = mid_rev.next
+
+        return True
+
+# 235 Lowest common ancestor of a binary search Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+        parent_val = root.val
+        p_val = p.val
+        q_val = q.val
+        if p_val > parent_val and q_val > parent_val:
+            return self.lowestCommonAncestor(root.right, p, q)
+        elif p_val<parent_val and q_val < parent_val:
+            return self.lowestCommonAncestor(root.left, p, q)
+        else:
+            return root
+
+# 233 Number of digit one
+import math
+class Solution(object):
+    def countDigitOne(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        if n<1:
+            return 0
+        if n==1:
+            return 1
+
+        res = 0
+
+        n_digits = int(math.log10(n)) + 1
+
+        for i in range(n_digits):
+            base = 10**(i+1)
+            # number of 1 at the position i (from the right). for example i=1,
+            # it is number of 1 at the second position from the right (i.e. 1x)
+            res += (n//(base))*(base//10) + self.count_1_per_base(n%base, base//10)
+        return res
+
+    def count_1_per_base(self, n, base):
+        if base == 1:
+            return int(n>=base)
+        res  = 0
+        if n//base>1:
+            res += base
+        elif n//base==1:
+            res += n%base +1
+        return res
+
+#
