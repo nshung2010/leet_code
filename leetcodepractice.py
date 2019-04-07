@@ -7446,4 +7446,346 @@ class Solution(object):
             res += n%base +1
         return res
 
-#
+#236: Lowest Common Ancestor of a Binary Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+        self.ans = None
+        def node_search(node, p, q):
+            if not node:
+                return False
+
+            left = node_search(node.left, p, q)
+
+            right = node_search(node.right, p, q)
+
+            if node == p or node ==q:
+                mid = True
+            else:
+                mid = False
+            if left+right+mid>=2:
+                self.ans = node
+            return mid or left or right
+
+        node_search(root, p, q)
+        return self.ans
+
+# solution 2: using stack
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def lowestCommonAncestor(self, root, p, q):
+        parent = {root: None}
+        stack = [root]
+        while stack:
+            node = stack.pop()
+            if node.left:
+                parent[node.left] = node
+                stack.append(node.left)
+            if node.right:
+                parent[node.right] = node
+                stack.append(node.right)
+
+        # Ancestors set for node p
+        ancestors = set()
+        while p:
+            ancestors.add(p)
+            p = parent[p]
+        # interact back q from their ancestors util it is in ancestors
+        while q not in ancestors and q:
+            q = parent[q]
+        return q
+# Sol 3: complicated
+class Solution:
+
+    # Three static flags to keep track of post-order traversal.
+
+    # Both left and right traversal pending for a node.
+    # Indicates the nodes children are yet to be traversed.
+    BOTH_PENDING = 2
+    # Left traversal done.
+    LEFT_DONE = 1
+    # Both left and right traversal done for a node.
+    # Indicates the node can be popped off the stack.
+    BOTH_DONE = 0
+
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+
+        # Initialize the stack with the root node.
+        stack = [(root, Solution.BOTH_PENDING)]
+
+        # This flag is set when either one of p or q is found.
+        one_node_found = False
+
+        # This is used to keep track of LCA index.
+        LCA_index = -1
+
+        # We do a post order traversal of the binary tree using stack
+        while stack:
+
+            parent_node, parent_state = stack[-1]
+
+            # If the parent_state is not equal to BOTH_DONE,
+            # this means the parent_node can't be popped of yet.
+            if parent_state != Solution.BOTH_DONE:
+
+                # If both child traversals are pending
+                if parent_state == Solution.BOTH_PENDING:
+
+                    # Check if the current parent_node is either p or q.
+                    if parent_node == p or parent_node == q:
+
+                        # If one_node_found is set already, this means we have found both the nodes.
+                        if one_node_found:
+                            return stack[LCA_index][0]
+                        else:
+                            # Otherwise, set one_node_found to True,
+                            # to mark one of p and q is found.
+                            one_node_found = True
+
+                            # Save the current top index of stack as the LCA_index.
+                            LCA_index = len(stack) - 1
+
+                    # If both pending, traverse the left child first
+                    child_node = parent_node.left
+                else:
+                    # traverse right child
+                    child_node = parent_node.right
+
+                # Update the node state at the top of the stack
+                # Since we have visited one more child.
+                stack.pop()
+                stack.append((parent_node, parent_state - 1))
+
+                # Add the child node to the stack for traversal.
+                if child_node:
+                    stack.append((child_node, Solution.BOTH_PENDING))
+            else:
+
+                # If the parent_state of the node is both done,
+                # the top node could be popped off the stack.
+
+                # i.e. If LCA_index is equal to length of stack. Then we decrease LCA_index by 1.
+                if one_node_found and LCA_index == len(stack) - 1:
+                    LCA_index -= 1
+                stack.pop()
+
+        return None
+# 237 Delete Node in a linked list:
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def deleteNode(self, node):
+        """
+        :type node: ListNode
+        :rtype: void Do not return anything, modify node in-place instead.
+        """
+        node.val = node.next.val
+        node.next = node.next.next
+
+# 238 product of array except self
+class Solution(object):
+    def productExceptSelf(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        product = 1
+        count_zeros = 0
+        for num in nums:
+            if num !=0:
+                product *= num
+            else:
+                count_zeros += 1
+        output = []
+        for i, num in enumerate(nums):
+            if count_zeros == 0:
+                output.append(product//num)
+            elif count_zeros >1:
+                output.append(0)
+            elif num==0:
+                output.append(product)
+            else:
+                output.append(0)
+
+        return output
+# 242 Valid anagram:
+class Solution(object):
+    def isAnagram(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: bool
+        """
+        s_list = sorted([x for x in s])
+        t_list = sorted([x for x in t])
+        return s_list == t_list
+
+# best solution
+class Solution(object):
+    def isAnagram(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: bool
+        """
+        if len(s) != len(t):
+            return False
+        counter = [0] * 26
+        for i in range(len(s)):
+            counter[ord(s[i]) - ord('a')] += 1
+            counter[ord(t[i]) - ord('a')] -= 1
+        return all([x == 0 for x in counter])
+
+# 240 Search a 2D matrix II
+class Solution(object):
+    def searchMatrix(self, matrix, target):
+        """
+        :type matrix: List[List[int]]
+        :type target: int
+        :rtype: bool
+        """
+        if matrix and matrix[0]:
+            num_row = len(matrix)
+            num_col = len(matrix[0])
+            row = num_row - 1
+            col = 0
+            while num_row > row>= 0 and 0<=col<num_col:
+                if matrix[row][col] > target:
+                    row -= 1
+                elif matrix[row][col] < target:
+                    col += 1
+                else:
+                    return True
+        return False
+
+# 241 Different ways to add parentheses
+from operator import *
+class Solution(object):
+    def diffWaysToCompute(self, input):
+        """
+        :type input: str
+        :rtype: List[int]
+        """
+        ops = {"+": add, "-": sub, "*": mul, "/": div}
+        ans = []
+        for i, c in enumerate(input):
+            if c in ops:
+                left = self.diffWaysToCompute(input[:i])
+                right = self.diffWaysToCompute(input[i+1:])
+                ans.extend([ops[c](a, b) for a in left for b in right])
+        return ans if ans else [int(input)]
+
+# 257 Binary Tree Paths
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def binaryTreePaths(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[str]
+        """
+        if not root:
+            return []
+        if not root.left and not root.right:
+            return [str(root.val)]
+        ans, left, right = [], [], []
+        if root.left:
+            left = self.binaryTreePaths(root.left)
+            ans += [str(root.val) + '->' + x for x in left]
+        if root.right:
+            right = self.binaryTreePaths(root.right)
+            ans += [str(root.val) + '->' + x for x in right]
+        return ans
+
+# 258 Add digits:
+class Solution(object):
+    def addDigits(self, num):
+        """
+        :type num: int
+        :rtype: int
+        """
+        if num == 0:
+            return 0
+        return 1+ (num-1) % 9
+class Solution(object):
+    def addDigits(self, num):
+        """
+        :type num: int
+        :rtype: int
+        """
+        t = list(str(num))
+        while len(t) > 1:
+            num = sum(map(int, t))
+            t = list(str(num))
+        return num
+
+# 239 Slidign Window maximum:
+class Solution(object):
+    def maxSlidingWindow(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+        q = collections.deque()
+        out = []
+        for i, num in enumerate(nums):
+            while q and nums[q[-1]] < num:
+                q.pop()
+            q.append(i)
+            if q[0]==i-k:
+                q.popleft()
+            if i>=k-1:
+                out.append(nums[q[0]])
+        return out
+# sol 2: using heap
+class Solution(object):
+    def maxSlidingWindow(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+        counter, heap, out = collections.Counter(), [], []
+        for i, num in enumerate(nums):
+            counter[num] += 1
+            heapq.heappush(heap, -num)
+            while not counter[-heap[0]]:
+                heapq.heappop(heap)
+            if i>=k-1:
+                out.append(-heap[0])
+                counter[nums[i-k+1]] -=1
+        return out
