@@ -7789,3 +7789,192 @@ class Solution(object):
                 out.append(-heap[0])
                 counter[nums[i-k+1]] -=1
         return out
+#260 Single Number III
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        counter = collections.Counter(nums)
+        return [x for x in counter if counter[x]==1]
+
+# 262 Trips and Users
+# Write your MySQL query statement below
+SELECT
+Request_at as Day,
+ROUND( SUM(case when substring(Status, 1,  9)="cancelled" then 1 else 0 end)/count(Status) ,2 ) as "Cancellation Rate"
+FROM Trips
+WHERE Client_Id in
+(select Users_Id from Users where Banned="No") and
+Request_at BETWEEN "2013-10-01" and "2013-10-03"
+GROUP BY Request_at
+
+# 263 Ugly number
+class Solution(object):
+    def isUgly(self, num):
+        """
+        :type num: int
+        :rtype: bool
+        """
+        if num<1:
+            return False
+        if num==1 or num==2 or num==3 or num==5:
+            return True
+        if num/2 == num/2.0:
+            return self.isUgly(num//2)
+        elif num/3 == num/3.0:
+            return self.isUgly(num//3)
+        elif num/5 == num/5.0:
+            return self.isUgly(num//5)
+        else:
+            return False
+
+# 264 Ugly Number II:
+class Solution(object):
+    def nthUglyNumber(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        ugly=[1]
+        i2, i3, i5=0, 0, 0
+        while n>1:
+            u_min = min(2*ugly[i2], 3*ugly[i3], 5*ugly[i5])
+            if u_min == 2*ugly[i2]:
+                i2 += 1
+            if u_min == 3*ugly[i3]:
+                i3 += 1
+            if u_min == 5*ugly[i5]:
+                i5 += 1
+            ugly.append(u_min)
+            n -= 1
+        return ugly[-1]
+
+# Solution 2 based on XOR (^).
+"""
+Well, the XOR solution is based on the fact that the largest element
+in the list is the one that replaced the missing element we are
+searching for. This means the largest element can never be missing.
+The actual list contains integers from 0 to n, the list we are given
+has 1 missing element.
+So we can conclude n = length of the given list
+What you need to know about XOR is that it's both commutive and
+assosiative
+commutive means A ^ B = B ^ A
+assosiative means (A ^ B) ^ C = A ^ (B ^ C)
+This means that order doesn't matter
+Other thing you need to know about XOR, if you XOR 2 similar numbers,
+the result is 0. A ^A = 0
+So now we will XOR the value of n with all the indicies from 0 to n-1
+and with all the values we have in our array.
+For example:
+array = 0,1,2,4
+index = 0,1,2,3
+n = 4
+4 ^ (0^0) ^ (11) ^ (2^2) ^ (4^3)
+= (4^4) ^ (0^0) ^ (11) ^ (2^2) ^ 3
+= 0 ^ 0 ^ 0 ^ 0 ^ 3
+= 3
+"""
+class Solution:
+    def missingNumber(self, nums):
+        missing = len(nums)
+        for i, num in enumerate(nums):
+            missing ^= i ^ num
+        return missing
+# 273 H index:
+class Solution(object):
+    def hIndex(self, citations):
+        """
+        :type citations: List[int]
+        :rtype: int
+        """
+        if not citations:
+            return 0
+        #if len(citations) == 1:
+        #    return int(citations[0] >= 1)
+        citations.sort()
+        citations = citations[::-1]
+        n = len(citations)
+        # print(citations)
+        for i in range(n):
+            if i<n-1 and citations[i] >= i+1 and citations[i+1] <= i+1:
+                return i+1
+            elif i==n-1 and citations[i] >= i+1:
+                return i+1
+        return 0
+
+class Solution(object):
+    def hIndex(self, citations):
+        """
+        :type citations: List[int]
+        :rtype: int
+        """
+
+        citations.sort(reverse=True)
+
+        for i in range(len(citations)):
+            if citations[i] < i+1:
+                return i
+
+        return len(citations)
+
+class Solution:
+    def hIndex(self, citations: List[int]) -> int:
+        citations = sorted(citations, reverse=True)
+        count_citations = 0
+        h = len(citations)
+        i = 0
+        while(i < len(citations)):
+            citation = citations[i]
+            if citation >= h:
+                count_citations += 1
+                i += 1
+            else:
+                h -= 1
+            if h == count_citations:
+                return h
+        return 0
+
+#274 Integer to english words
+
+class Solution(object):
+    def numberToWords(self, num):
+        to19 = 'One Two Three Four Five Six Seven Eight Nine Ten Eleven Twelve ' \
+               'Thirteen Fourteen Fifteen Sixteen Seventeen Eighteen Nineteen'.split()
+        tens = 'Twenty Thirty Forty Fifty Sixty Seventy Eighty Ninety'.split()
+        def words(n):
+            if n < 20:
+                return to19[n-1:n]
+            if n < 100:
+                return [tens[n/10-2]] + words(n%10)
+            if n < 1000:
+                return [to19[n/100-1]] + ['Hundred'] + words(n%100)
+            for p, w in enumerate(('Thousand', 'Million', 'Billion'), 1):
+                if n < 1000**(p+1):
+                    return words(n/1000**p) + [w] + words(n%1000**p)
+        return ' '.join(words(num)) or 'Zero'
+
+#275 H-Index II
+class Solution(object):
+    def hIndex(self, citations):
+        """
+        :type citations: List[int]
+        :rtype: int
+        """
+        if not citations:
+            return 0
+        n = len(citations)
+        left, right = 0, n
+        while left<right:
+
+            mid = (left+right)//2
+            # print(n-mid, citations[mid])
+            if citations[mid] > n-mid:
+                right = mid
+            elif citations[mid] <n-mid:
+                left = mid+1
+            else:
+                return n-mid
+        return n-left
+
