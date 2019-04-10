@@ -7978,3 +7978,259 @@ class Solution(object):
                 return n-mid
         return n-left
 
+# 278 First bad version
+# The isBadVersion API is already defined for you.
+# @param version, an integer
+# @return a bool
+# def isBadVersion(version):
+
+class Solution(object):
+    def firstBadVersion(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        left = 1
+        right = n
+        while left<right:
+            mid = (left + right)//2
+            if isBadVersion(mid):
+                right = mid
+            else:
+                left = mid+1
+        return left
+
+# 279 Perfect Squares
+lass Solution(object):
+    def numSquares(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+
+        if n<=1:
+            return 1
+        dp = [None]*(n+1)
+        dp[0], dp[1] = 0, 1
+
+        for i in range(2, n+1):
+            q = 1
+            min_square = float('inf')
+            while q*q<=i:
+                # print(q, self.numSquares(n-q*q))
+                min_square = min(min_square, 1 + dp[i-q*q])
+                q += 1
+            dp[i] = min_square
+        return dp[n]
+
+# 282 Expression Add Operators
+class Solution:
+    def addOperators(self, num, target):
+
+        N = len(num)
+        answers = []
+        def recurse(index, prev_operand, current_operand, value, string):
+
+            # Done processing all the digits in num
+            if index == N:
+
+                # If the final value == target expected AND
+                # no operand is left unprocessed
+                if value == target and current_operand == 0:
+                    answers.append("".join(string[1:]))
+                return
+
+            # Extending the current operand by one digit
+            current_operand = current_operand*10 + int(num[index])
+            str_op = str(current_operand)
+
+            # To avoid cases where we have 1 + 05 or 1 * 05 since 05 won't be a
+            # valid operand. Hence this check
+            if current_operand > 0:
+
+                # NO OP recursion
+                recurse(index + 1, prev_operand, current_operand, value, string)
+
+            # ADDITION
+            string.append('+'); string.append(str_op)
+            recurse(index + 1, current_operand, 0, value + current_operand, string)
+            string.pop();string.pop()
+
+            # Can subtract or multiply only if there are some previous operands
+            if string:
+
+                # SUBTRACTION
+                string.append('-'); string.append(str_op)
+                recurse(index + 1, -current_operand, 0, value - current_operand, string)
+                string.pop();string.pop()
+
+                # MULTIPLICATION
+                string.append('*'); string.append(str_op)
+                recurse(index + 1, current_operand * prev_operand, 0, value - prev_operand + (current_operand * prev_operand), string)
+                string.pop();string.pop()
+        recurse(0, 0, 0, 0, [])
+        return answers
+
+#283 Move Zeroes
+class Solution(object):
+    def moveZeroes(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        if len(nums)<=1:
+            return
+        pointer_0, pointer_non_zero = 0, 0
+
+        while pointer_non_zero < len(nums):
+            while pointer_non_zero <len(nums) and nums[pointer_non_zero] == 0:
+                pointer_non_zero +=1
+
+            while pointer_0<len(nums) and nums[pointer_0] != 0:
+                pointer_0 += 1
+            # print(pointer_0, pointer_non_zero)
+            if pointer_non_zero<len(nums) and pointer_0 < len(nums) and pointer_non_zero>pointer_0:
+                nums[pointer_0], nums[pointer_non_zero] = nums[pointer_non_zero], nums[pointer_0]
+            pointer_non_zero = pointer_non_zero + 1
+        return
+
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        #count the zeros
+        num_zeroes = 0
+        for n in nums:
+            if n == 0:
+                num_zeroes += 1
+        #Make all the non-zero elements retain their original order
+        res = [n for n in nums if n != 0]
+
+        #Move all zeroes to the end
+        res += [0] * num_zeroes
+        nums = res
+        #return nums
+
+class Solution2:
+    def moveZeroes(self, nums: List[int]) -> None:
+        slow = 0
+        ##if the current element is not 0, then we need to
+        ##append it just ijn front of last non 0 element we found
+        for i in range(len(nums)):
+            if nums[i] != 0:
+                nums[slow] = nums[i]
+                slow += 1
+        #fulfill remaining array with 0's
+        for i in range(slow, len(nums)):
+            nums[i] = 0
+
+        #return nums
+
+class Solution3:
+   def moveZeroes(self, nums: List[int]) -> None:
+        slow = cur = 0
+        for cur in range(len(nums)):
+            if nums[cur] != 0:
+                #swap the postion of slow pointer and cur
+                nums[slow], nums[cur] = nums[cur], nums[slow]
+                slow += 1
+        #return nums
+
+# 284 Peeking Iterator
+# Below is the interface for Iterator, which is already defined for you.
+#
+# class Iterator(object):
+#     def __init__(self, nums):
+#         """
+#         Initializes an iterator object to the beginning of a list.
+#         :type nums: List[int]
+#         """
+#
+#     def hasNext(self):
+#         """
+#         Returns true if the iteration has more elements.
+#         :rtype: bool
+#         """
+#
+#     def next(self):
+#         """
+#         Returns the next element in the iteration.
+#         :rtype: int
+#         """
+
+class PeekingIterator(object):
+    def __init__(self, iterator):
+        self.iter = iterator
+        self.temp = self.iter.next() if self.iter.hasNext() else None
+
+    def peek(self):
+        return self.temp
+
+    def next(self):
+        ret = self.temp
+        self.temp = self.iter.next() if self.iter.hasNext() else None
+        return ret
+
+    def hasNext(self):
+        return self.temp is not None
+
+
+# Your PeekingIterator object will be instantiated and called as such:
+# iter = PeekingIterator(Iterator(nums))
+# while iter.hasNext():
+#     val = iter.peek()   # Get the next element but not advance the iterator.
+#     iter.next()         # Should return the same value as [val].
+
+#282 Expression add operators
+class Solution(object):
+    def addOperators(self, num, target):
+        """
+        :type num: str
+        :type target: int
+        :rtype: List[str]
+        """
+        N = len(num)
+        ans = []
+
+        def recurse(index, prev_operand, current_operand, value, string):
+
+            # Done processing all the digits in num
+            if index==N:
+                # if the final value = target expected and
+                # no operand is left unprocessed
+                if value == target and current_operand == 0:
+                    ans.append("".join(string[1:]))
+                return
+            # Extending the current operand by one digit
+            current_operand = current_operand*10 + int(num[index])
+            str_op = str(current_operand)
+            # To avoid cases where we have 1+05 or 1*05 since 05 is not a
+            # valid operand. we need to perform current_operand
+            if current_operand>0:
+                # No operation recursion
+                recurse(index+1, prev_operand, current_operand, value, string)
+            # Addition
+            string.append('+')
+            string.append(str_op)
+            recurse(index+1, current_operand, 0, value + current_operand, string)
+            string.pop()
+            string.pop()
+
+            # can suctract or multiply only if there are some previous operands
+            if string:
+                # Subtraction
+                string.append('-')
+                string.append(str_op)
+                recurse(index+1, -current_operand, 0, value-current_operand, string)
+                string.pop()
+                string.pop()
+
+                # Multiplication
+                string.append('*')
+                string.append(str_op)
+                recurse(index+1, current_operand*prev_operand, 0, value-prev_operand+(current_operand*prev_operand), string)
+                string.pop()
+                string.pop()
+        recurse(0, 0, 0, 0, [])
+        return ans
