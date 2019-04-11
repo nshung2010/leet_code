@@ -8234,3 +8234,192 @@ class Solution(object):
                 string.pop()
         recurse(0, 0, 0, 0, [])
         return ans
+
+# 287 Find the duplicate number:
+# this is similar to cycle link list II with a link is index->nums[index]
+class Solution(object):
+    def findDuplicate(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        fast = nums[0]
+        slow = nums[0]
+        while True:
+            fast = nums[nums[fast]]
+            slow = nums[slow]
+            if slow == fast:
+                break
+        pt1 = nums[0]
+        pt2 = slow
+        while pt1!=pt2:
+            pt1=nums[pt1]
+            pt2=nums[pt2]
+        return pt1
+
+# 289 Game of Life:
+class Solution(object):
+    def gameOfLife(self, board):
+        """
+        :type board: List[List[int]]
+        :rtype: None Do not return anything, modify board in-place instead.
+        """
+        max_row = len(board)
+        max_col = len(board[0])
+        new_board = [[None]*max_col for _ in range(max_row)]
+        for r in range(max_row):
+            for c in range(max_col):
+                new_board[r][c] = self.next_live_dead(board, r, c)
+        for r in range(max_row):
+            for c in range(max_col):
+                board[r][c] = new_board[r][c]
+        return board
+    def next_live_dead(self, board, row, col):
+        max_row = len(board)
+        max_col = len(board[0])
+        neigh_row = [row-1, row, row+1]
+        neigh_col = [col-1, col, col+1]
+        count_1 = 0
+        for r in neigh_row:
+            for c in neigh_col:
+                if r==row and c==col:
+                    cel_val = board[row][col]
+                elif 0 <= r < max_row and 0 <= c < max_col and board[r][c]==1:
+                    count_1 +=1
+
+        if cel_val == 1 and count_1<2:
+            return 0
+        elif cel_val == 1 and (count_1==2 or count_1==3):
+            return 1
+        elif cel_val == 1 and count_1 >3:
+            return 0
+        elif cel_val == 0 and count_1==3:
+            return 1
+        else:
+            return 0
+
+# Sol 2:
+"""
+As the desscription:
+You cannot update some cells first and then use their updated values to update other cells.
+
+If we wanted to change the state in place,
+We need to set another number that can represent the state now and the next state
+So we don't mess up our count.
+
+So I use
+3 means alive now and going to die,
+2 means dead now and going alive.
+
+All the '%2' in the count_alive() is just a way to make it cleaner [0]
+Avoiding bunch of if-else
+Because 3%2==1 and 2%2==0
+
+Time Complexity is O(MN)
+Because we go through the whole board once [1]
+Each time at a (i,j) we use O(1) to count its alive neighbor [2]
+And go through the whole board another time to convert 3->0 and 2->1 [3]
+O(MN*1+MN)~=O(MN)
+
+Space Complexity is O(1)
+Because we done it in place.
+
+I learn this really nice and clean solution from @zhuyinghua1203
+"""
+class Solution(object):
+    def gameOfLife(self, board):
+        if board==None or len(board)==0 or len(board[0])==0: return board
+
+        m = len(board)
+        n = len(board[0])
+
+        def count_alive(i, j):
+            if i<0 or j<0 or i>=m or j>=n: return 0
+            count = 0
+
+            #bottom, top, right, left
+            if i+1<m: count+=board[i+1][j]%2 #[0]
+            if 0<=i-1: count+=board[i-1][j]%2
+            if j+1<n: count+=board[i][j+1]%2
+            if 0<=j-1: count+=board[i][j-1]%2
+
+            #bottomright, topleft, bottomleft, topright
+            if i+1<m and j+1<n: count+=board[i+1][j+1]%2
+            if 0<=i-1 and 0<=j-1: count+=board[i-1][j-1]%2
+            if i+1<m and 0<=j-1: count+=board[i+1][j-1]%2
+            if 0<=i-1 and j+1<n: count+=board[i-1][j+1]%2
+
+            return count
+
+        for i in xrange(m): #[1]
+            for j in xrange(n):
+                count = count_alive(i, j) #[2]
+
+                if board[i][j]==1:
+                    if count<2 or count>3:
+                        board[i][j] = 3
+                elif board[i][j]==0:
+                    if count==3:
+                        board[i][j] = 2
+
+        for i in xrange(m): #[3]
+            for j in xrange(n):
+                if board[i][j]==2:
+                    board[i][j] = 1
+                elif board[i][j]==3:
+                    board[i][j] = 0
+
+        return board
+
+# 290 Word Pattern
+class Solution(object):
+    def wordPattern(self, pattern, str):
+        """
+        :type pattern: str
+        :type str: str
+        :rtype: bool
+        """
+        word_dict = {}
+        str_list = str.split()
+        if len(str_list) != len(pattern):
+            return False
+        for ch, word in zip(pattern, str_list):
+            if word not in word_dict.values():
+                word_dict[ch] = word
+            elif ch not in word_dict:
+                return False
+
+        new_str = " ".join([word_dict[ch] for ch in pattern])
+        return new_str == str
+
+class Solution(object):
+    def wordPattern(self, pattern, str_):
+        """
+        :type pattern: str
+        :type str: str
+        :rtype: bool
+        """
+        d_hash = {}
+        str_ = str_.split()
+
+        if len(pattern) != len(str_):
+            return False
+
+        for p, s in zip(pattern, str_):
+            if p in d_hash:
+                if d_hash[p] != s:
+                    return False
+            elif s in d_hash.values():
+                return False
+            else:
+                d_hash[p] = s
+        return True
+
+# 292 Nim Game:
+class Solution(object):
+    def canWinNim(self, n):
+        """
+        :type n: int
+        :rtype: bool
+        """
+        return n%4>0
