@@ -8423,3 +8423,197 @@ class Solution(object):
         :rtype: bool
         """
         return n%4>0
+# 295 Find median from data stream:
+from heapq import *
+class MedianFinder(object):
+
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self._low = []
+        self._high = []
+
+
+    def addNum(self, num):
+        """
+        :type num: int
+        :rtype: None
+        """
+        heappush(self._low, -num)
+        heappush(self._high, -heappop(self._low))
+        if len(self._high) > len(self._low):
+            heappush(self._low, -heappop(self._high))
+
+    def findMedian(self):
+        """
+        :rtype: float
+        """
+        if len(self._high)==len(self._low):
+            return (-self._low[0] + self._high[0])/2.0
+        return -self._low[0]
+
+
+
+# Your MedianFinder object will be instantiated and called as such:
+# obj = MedianFinder()
+# obj.addNum(num)
+# param_2 = obj.findMedian()
+
+# 297 Serialize and deserialize Binary Tree
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Codec:
+
+    def serialize(self, root):
+        """Encodes a tree to a single string.
+
+        :type root: TreeNode
+        :rtype: str
+        """
+
+        if root == None: return None
+        res = {"val": root.val,
+               "left": self.serialize(root.left) if root.left else None,
+               "right": self.serialize(root.right) if root.right else None}
+        return res
+
+
+    def deserialize(self, data):
+        """Decodes your encoded data to tree.
+
+        :type data: str
+        :rtype: TreeNode
+        """
+        if data == None: return None
+        root = TreeNode(data["val"])
+        root.left = self.deserialize(data["left"])
+        root.right = self.deserialize(data["right"])
+        return root
+
+
+# Your Codec object will be instantiated and called as such:
+# codec = Codec()
+# codec.deserialize(codec.serialize(root))
+
+# 299 Bulls and cows
+class Solution(object):
+    def getHint(self, secret, guess):
+        """
+        :type secret: str
+        :type guess: str
+        :rtype: str
+        """
+        bull = 0
+        cow = 0
+        secret_list, guess_list = [], []
+        for s, g in zip(secret, guess):
+            if s==g:
+                bull += 1
+            else:
+                secret_list.append(s)
+                guess_list.append(g)
+        for ch in guess_list:
+            if ch in secret_list:
+                cow +=1
+                secret_list.remove(ch)
+        return str(bull) + 'A' + str(cow) + 'B'
+
+# 300 Longest increasing subsequence
+class Solution(object):
+    def lengthOfLIS(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums:
+            return 0
+        dp=[1] * len(nums)
+        for i in range(len(nums)):
+            max_length = 0
+            for j in range(i):
+                if nums[j] < nums[i]:
+                    max_length = max(max_length, dp[j])
+            dp[i] = max_length + 1
+        return max(dp)
+
+# Python program to find
+# length of longest
+# increasing subsequence
+# in O(n Log n) time
+
+# Binary search (note
+# boundaries in the caller)
+# A[] is ceilIndex
+# in the caller
+class Solution(object):
+    def lengthOfLIS(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        def binary_search(nums, l, r, key):
+            # search to find the index of key
+            # if we need to insert key into
+            # the order array nums
+            while r-l>1:
+                m = l + (r-l)//2
+                if nums[m] >= key:
+                    r = m
+                else:
+                    l = m
+            return r
+        size = len(nums)
+        tail_table = [0 for _ in range(size + 1)]
+        len_LIS = 0 # always points empty slot
+        tail_table[0] = nums[0]
+        len_LIS = 1
+        for i in range(1, size):
+            if nums[i] < tail_table[0]:
+                # new smallest value
+                tail_table[0] = nums[i]
+            elif nums[i] > tail_table[len_LIS-1]:
+                # num[i] wants to extend largest subsequence
+                tail_table[len_LIS] = nums[i]
+                len_LIS += 1
+            else:
+                # nums[i] wants to be current
+                # end candidate of an existing
+                # subsequence. It will replace
+                # ceil value in tail_table
+                tail_table[binary_search(tail_table, -1, len_LIS-1, nums[i])] = nums[i]
+        return len_LIS
+
+# 303 Range sum query - Immutable
+class NumArray(object):
+
+    def __init__(self, nums):
+        """
+        :type nums: List[int]
+        """
+        self._nums = nums
+        self._length = len(nums)
+        self._sum = [0] * (len(nums)+1)
+        for i in range(0, len(nums)):
+            self._sum[i+1] = self._sum[i] + nums[i]
+
+    def sumRange(self, i, j):
+        """
+        :type i: int
+        :type j: int
+        :rtype: int
+        """
+        if i>=self._length or j>=self._length or i<0 or j<0 or i>j:
+            return None
+
+        return self._sum[j+1] - self._sum[i]
+
+
+# Your NumArray object will be instantiated and called as such:
+# obj = NumArray(nums)
+# param_1 = obj.sumRange(i,j)
