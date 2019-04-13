@@ -1302,7 +1302,8 @@ class Solution(object):
         if target == 0:
             res.append(path)
             return
-        for i in xrange(index, len(nums)):
+        for i in
+        range(index, len(nums)):
             if nums[i]>target:
                 break
             self.dfs(nums, target-nums[i], i, path+[nums[i]], res)
@@ -8617,3 +8618,77 @@ class NumArray(object):
 # Your NumArray object will be instantiated and called as such:
 # obj = NumArray(nums)
 # param_1 = obj.sumRange(i,j)
+
+# 301 Remove Invalid Parentheses
+class Solution(object):
+    def removeInvalidParentheses(self, s):
+        """
+        :type s: str
+        :rtype: List[str]
+        """
+        misplaced_left, misplaced_right = 0, 0
+        for ch in s:
+            if ch == '(':
+                misplaced_left += 1
+            elif ch == ')':
+                misplaced_right += 1
+                if misplaced_left >0:
+                    misplaced_left -= 1
+                    misplaced_right -=1
+
+        def recursion(index, left, right, left_rem, right_rem, cur_exp):
+            if index==len(s):
+                if left == right and left_rem == right_rem == 0:
+                    self.ans.add(cur_exp)
+                    return
+            else: # s[index] can only be '('; ')' or a letter
+                if s[index] == '(':
+                    if left_rem > 0: # we can remove left parentheses
+                        recursion(index+1, left, right, left_rem-1, right_rem, cur_exp)
+                    recursion(index+1, left+1, right, left_rem, right_rem, cur_exp+'(') # keep current left parentheses
+                elif s[index] == ')':
+                    if right_rem>0: # if we can remove right parenthesis
+                        recursion(index+1, left, right, left_rem, right_rem-1, cur_exp)
+                    if left>right: # if we can keep the right parenthesis, we can only keep if right<left
+                        recursion(index+1, left, right+1, left_rem, right_rem, cur_exp + ')')
+                else:
+                    recursion(index+1, left, right, left_rem, right_rem, cur_exp + s[index])
+        self.ans = set()
+        recursion(0, 0, 0, misplaced_left, misplaced_right, '')
+
+        return list(self.ans)
+
+# 304 Range Sum Query 2D-Immutable
+class NumMatrix(object):
+
+    def __init__(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        """
+        self._matrix = matrix
+        if matrix:
+            n_row = len(matrix)
+            n_col = len(matrix[0])
+        else:
+            n_row, n_col = 0, 0
+        self._sum = [[0] * (n_col+1) for _ in range(n_row+1)]
+
+        for i_row in range(n_row):
+            for i_col in range(n_col):
+                self._sum[i_row+1][i_col+1] = self._sum[i_row+1][i_col] + matrix[i_row][i_col] + self._sum[i_row][i_col+1] - self._sum[i_row][i_col]
+        print(self._sum)
+
+    def sumRegion(self, row1, col1, row2, col2):
+        """
+        :type row1: int
+        :type col1: int
+        :type row2: int
+        :type col2: int
+        :rtype: int
+        """
+        return self._sum[row2+1][col2+1] - self._sum[row1][col2+1] - self._sum[row2+1][col1] + self._sum[row1][col1]
+
+
+# Your NumMatrix object will be instantiated and called as such:
+# obj = NumMatrix(matrix)
+# param_1 = obj.sumRegion(row1,col1,row2,col2)
