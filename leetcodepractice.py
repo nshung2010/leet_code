@@ -8692,3 +8692,244 @@ class NumMatrix(object):
 # Your NumMatrix object will be instantiated and called as such:
 # obj = NumMatrix(matrix)
 # param_1 = obj.sumRegion(row1,col1,row2,col2)
+# 306 Additive Number
+class Solution(object):
+    def isAdditiveNumber(self, num):
+        """
+        :type num: str
+        :rtype: bool
+        """
+        for i in range(1, len(num) - 1):
+            for j in range(i + 1, len(num)):
+                s1, s2 = num[:i], num[i: j]
+
+                if (len(s1) > 1 and s1[0] == '0') or (len(s2) > 1 and s2[0] == '0'):
+                    continue
+
+                curr = s1 + s2
+                while len(curr) < len(num):
+                    s3 = str(int(s1) + int(s2))
+                    curr += s3
+                    s1, s2 = s2, s3
+
+                if curr == num:
+                    return True
+
+        return False
+
+# 30
+# Binary Indexed Tree
+class NumArray(object):
+
+    def __init__(self, nums):
+        """
+        :type nums: List[int]
+        """
+        n = len(nums)
+
+        self.nums = nums
+        self.bit = [0] * (n + 1)
+
+        for i in range(n):
+            self._update(i + 1, nums[i])
+
+    def update(self, i, val):
+        """
+        :type i: int
+        :type val: int
+        :rtype: None
+        """
+        self._update(i + 1, val - self.nums[i])
+        self.nums[i] = val
+
+    def sumRange(self, i, j):
+        """
+        :type i: int
+        :type j: int
+        :rtype: int
+        """
+        return self._sum(j + 1) - self._sum(i)
+
+    def _update(self, i, val):
+        while i < len(self.bit):
+            self.bit[i] += val
+            i += i & -i
+
+    def _sum(self, i):
+        total = 0
+        while i > 0:
+            total += self.bit[i]
+            i -= i & -i
+        return total
+
+# 309 Best time to buy and sell stock with cooldown
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        if not prices:
+            return 0
+        rest, buy, sell = [None]*len(prices), [None]*len(prices), [None]*len(prices)
+        rest[0] = 0
+        sell[0] = 0
+        buy[0] = -prices[0]
+        for i in range(1, len(prices)):
+            rest[i] = max(rest[i-1], sell[i-1]) # you either rest at i-1 or sell at i-1
+            sell[i] = buy[i-1]+prices[i] # you either sell at i-1 and rest or buy at i-1 and sell
+            buy[i] = max(buy[i-1], rest[i-1]-prices[i]) # you either buy at i-1 and rest or rest at i-1 and buy
+        return max(rest[-1], sell[-1], buy[-1])
+
+#O(1) space solution
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        if not prices:
+            return 0
+        rest, buy, sell = 0, -prices[0], 0
+
+        for i in range(1, len(prices)):
+            temp_rest, temp_sell, temp_buy = rest, sell, buy
+            rest = max(temp_rest, temp_sell)  # you either rest at i-1 or sell at i-1
+            sell = temp_buy+prices[i] # you either sell at i-1 and rest or buy at i-1 and sell
+            buy = max(temp_buy, temp_rest-prices[i]) # you either buy at i-1 and rest or rest at i-1 and buy
+
+        return max(rest, sell, buy)
+# 310 Minimum Height Trees
+# BFS
+class Solution(object):
+    def findMinHeightTrees(self, n, edges):
+        """
+        :type n: int
+        :type edges: List[List[int]]
+        :rtype: List[int]
+        """
+        if not n: return []
+        connect = [[] for _ in range(n)]
+        deg = [0] * n
+        for u, v in edges:
+            connect[u].append(v)
+            connect[v].append(u)
+            deg[u] += 1
+            deg[v] += 1
+        leaves = [x for x in range(n) if deg[x]<=1]
+        done = set(leaves)
+        while len(done) < n:
+            next = []
+            for x in leaves:
+                for u in connect[x]:
+                    if u in done:
+                        continue
+                    deg[u] -=1
+                    if deg[u] == 1:
+                        done.add(u)
+                        next.append(u)
+            leaves = next
+            # print(leaves)
+        return list(leaves)
+
+class Solution:
+    def findMinHeightTrees(self, n, edges):
+        if not n: return []
+        e = [[] for _ in range(n)]
+        for u, v in edges:
+            e[u].append(v)
+            e[v].append(u)
+
+        def longest_path(u, par=None):
+            mx = []
+            for v in e[u]:
+                if v != par:
+                    now = longest_path(v, u)
+                    if len(now) > len(mx):
+                        mx = now
+            mx.append(u)
+            return mx
+        fr = longest_path(0)[0]
+        path = longest_path(fr)
+        k = len(path)
+        return path[(k-1)>>1 : (k+2)>>1]
+
+def findMinHeightTrees(n, edges):
+    tree = [set() for _ in range(n)]
+    for u, v in edges: tree[u].add(v), tree[v].add(u)
+    q, nq = [x for x in range(n) if len(tree[x]) < 2], []
+    while True:
+        for x in q:
+            for y in tree[x]:
+                tree[y].remove(x)
+                if len(tree[y]) == 1: nq.append(y)
+        if not nq: break
+        nq, q = [], nq
+    return q
+
+# 312 Burst ballons
+class Solution(object):
+    def maxCoins(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        memo = {}
+        nums = [1] + nums + [1]
+        def dfs(l, r):
+            # maximum coin to get when burting all balloons
+            # from left+1 to right-1
+            if r-l==1: return 0
+            max_coin = 0
+            if (l, r) not in memo:
+                for k in range(l+1, r):
+                    max_coin = max(max_coin, dfs(l, k)+nums[l]*nums[k]*nums[r]+dfs(k, r))
+                memo[(l,r)] = max_coin
+            # print(memo)
+            return memo[(l,r)]
+        return dfs(0, len(nums)-1)
+
+class Solution(object):
+    def maxCoins(self, nums):
+        if not nums:
+            return 0
+        N = len(nums)
+        nums = [1] + nums + [1]
+        dp = [[0 for i in range(N+2)] for j in range(N+2)]
+        for l in range(1, N+1):
+            for start in range(1, N+1):
+                end = start + l - 1
+                if end > N:
+                    break
+                if l == 1:
+                    dp[start][end] = nums[start-1]*nums[start]*nums[start+1]
+                else:
+                    max_ = 0
+                    for last in range(start, end+1):
+                        v = dp[start][last-1] + dp[last+1][end] + nums[start-1]*nums[last]*nums[end+1]
+                        if v > max_:
+                            max_ = v
+                    dp[start][end] = max_
+        return dp[1][N]
+
+# Super Ugly Number:
+class Solution(object):
+    def nthSuperUglyNumber(self, n, primes):
+        """
+        :type n: int
+        :type primes: List[int]
+        :rtype: int
+        """
+        k = len(primes)
+        index = [0] * k
+        ugly = [1]
+        while n>1:
+            temp = [ugly[index[i]]*primes[i] for i in range(k)]
+            u_min = min(temp)
+            idx_min = temp.index(u_min)
+            index[idx_min] += 1
+            if u_min>ugly[-1]:
+                ugly.append(u_min)
+                n -= 1
+        # print(ugly)
+        return ugly[-1]
