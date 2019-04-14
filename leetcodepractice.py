@@ -8933,3 +8933,48 @@ class Solution(object):
                 n -= 1
         # print(ugly)
         return ugly[-1]
+# An improvement:
+class Solution:
+    def nthSuperUglyNumber(self, N,primes):
+        ugly_numbers = [0] * N
+        ugly_numbers[0] = 1
+        indexes = [0]* len(primes)
+        refactors = [i for i in primes]
+        for i in range(1, N):
+            ugly_numbers[i] = min(refactors)
+            for ind in [k for k, x in enumerate(refactors) if x == ugly_numbers[i]]:
+                indexes[ind] += 1
+                refactors[ind] = ugly_numbers[indexes[ind]]*primes[ind]
+        return ugly_numbers[-1]
+
+class Solution:
+    def nthSuperUglyNumber(self, n, primes):
+        """
+        :type n: int
+        :type primes: List[int]
+        :rtype: int
+        """
+        h, heap = set([1]), [1]
+        while n:
+            a = heappop(heap)
+            for i in primes:
+                m = a * i
+                if not m in h:
+                    heappush(heap, m)
+                    h.add(m)
+            n -= 1
+        return a
+
+class Solution:
+    def nthSuperUglyNumber(self, n, P):
+        res, heap = [1], [(P[i], P[i], 0) for i in range(len(P))]
+        while len(res) < n:
+            val, prm, idx = heapq.heappop(heap)
+            if val <= res[-1]:
+                while val <= res[-1]: idx += 1; val = prm * res[idx]
+            else:
+                res += val,
+                val, idx = prm * res[idx + 1], idx + 1
+            heapq.heappush(heap, (val, prm, idx))
+        return res[-1]
+
