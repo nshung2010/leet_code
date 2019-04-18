@@ -29,45 +29,6 @@ class Solution(object):
         :type tickets: List[List[str]]
         :rtype: List[str]
         """
-        graph = collections.defaultdict(list)
-        for beg, end in tickets:
-            graph[beg].append(end)
-        for airports in graph:
-            graph[airports].sort()
-
-        total_trips = len(tickets)
-        self.ans = []
-        res = ['JFK']
-        num_trips = 0
-        self.get_the_itinerary('JFK')
-        return res
-        def get_the_itinerary(begin):
-            """
-            Get the itinerary from
-            """
-            if not graph[begin]:
-                return
-            # print(res, begin, count, num_trips, n)
-
-                # self.ans.append(res)
-            for neighbor in graph[begin]:
-                graph[begin].remove(neighbor)
-                res.append(neighbor)
-                num_trips += 1
-                get_the_itinerary(neighbor)
-                if num_trips == total_trips:
-                    return
-                graph[begin].add(neighbor)
-                route.pop()
-                num_trips -= 1
-
-
-class Solution(object):
-    def findItinerary(self, tickets):
-        """
-        :type tickets: List[List[str]]
-        :rtype: List[str]
-        """
         def get_the_itinerary(begin):
             """
             Get the itinerary from
@@ -95,42 +56,29 @@ class Solution(object):
             graph[airport].sort()
 
         total_trips = len(tickets)+1
-        self.ans = []
         res = []
         get_the_itinerary('JFK')
         return res
-
-
-
+# Solution 2 is based on Hierholzer’s Algorithm
+"""
+void dfs(s) {
+    for all the neighbors of s:
+        dfs(n)
+    route.add(s)
+}
+"""
 class Solution(object):
     def findItinerary(self, tickets):
-        """
-        :type tickets: List[List[str]]
-        :rtype: List[str]
-        """
-        graph = {}
-        def build_graph(tickets):
-            for t in tickets:
-                start, end = t
-                graph[start] = graph.get(start, []) + [end]
-            for A in graph:
-                graph[A] = sorted(graph[A])
-
-        def dfs(S):
-            trip.append(S)
-            if len(trip) == length:
-                return True
-            if S in graph:
-                n, i = len(graph[S]), 0
-                while i < n:
-                    next_city = graph[S].pop(0)
-                    if dfs(next_city):
-                        return True
-                    graph[S].append(next_city)
-                    i += 1
-            trip.pop()
-            return False
-        build_graph(tickets)
-        trip, length = [], len(tickets) + 1
-        dfs("JFK")
-        return trip
+        graph = collections.defaultdict(list)
+        for beg, end in tickets:
+            graph[beg] += [end]
+        for airport in graph:
+            graph[airport] = sorted(graph[airport])[::-1]
+        def visit(airport):
+            while graph[airport]:
+                neighbor = graph[airport].pop()
+                visit(neighbor)
+            route.append(airport)
+        route = []
+        visit('JFK')
+        return route[::-1]
