@@ -179,3 +179,4 @@ class Solution(object):
                     dp[now] = dp[state] + 1
 
         return dp[-1]
+
