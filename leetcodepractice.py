@@ -8978,3 +8978,260 @@ class Solution:
             heapq.heappush(heap, (val, prm, idx))
         return res[-1]
 
+# 368 Largest divisible Subset
+class Solution(object):
+    def largestDivisibleSubset(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        if not nums:
+            return []
+        nums=sorted(nums)
+        dp=[[nums[i]] for i in range(len(nums))]
+        max_len,res=1,dp[0]
+        for i in range(1,len(nums)):
+            for j in range(i):
+                if nums[i]%nums[j]==0 and len(dp[i])<len(dp[j])+1:
+                    dp[i]=dp[j]+[nums[i]]
+                    if len(dp[i])>max_len:
+                        max_len,res=len(dp[i]),dp[i]
+        return res
+
+# Another solution:
+
+class Solution(object):
+    def recur(path,lastIdx):
+            for i in range(lastIdx+1,n):
+                curr = nums[i]
+                if curr % path[-1] == 0 :
+                    if curr not in seen or seen[curr] < len(path):
+                        seen[curr] = len(path)
+                        recur(path + [curr],i)
+            d[len(path)] = path
+
+        n = len(nums)
+        if n <= 1: return nums
+
+        d = {};seen = {}
+        nums.sort()
+        for i in range(n-1):
+            recur([nums[i]],i)
+        maxKey = max(d.keys())
+        return d[maxKey]
+class Node(object):
+        def __init__(self,val,parent):
+            self.val=val
+            self.children=[]
+            self.depth=0
+            self.parent=parent
+        def append(self,val):
+            found=False
+            for child in self.children:
+                if(val%child.val==0):
+                    child.append(val)
+                    found=True
+            if(not found):
+                self.children.append(Node(val,self))
+                self.update_depth(1)
+        def get_longest_path(self,path):
+            path.append(self.val)
+            if(len(self.children)==0):
+                return path
+            maximum_depth=-1
+            max_index=-1
+            for i in range(0,len(self.children)):
+                child_depth=self.children[i].depth
+                if(child_depth>maximum_depth):
+                    maximum_depth=child_depth
+                    max_index=i
+            self.children[max_index].get_longest_path(path)
+            return path
+        def update_depth(self,depth):
+            if(depth<self.depth):
+                return
+            else:
+                self.depth=depth
+                if(self.parent is not None):
+                    self.parent.update_depth(depth+1)
+            return
+
+class Solution(object):
+    def largestDivisibleSubset(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        if(nums is None):
+            return []
+        n=len(nums)
+        if(n<=1):
+            return nums
+        nums.sort()
+        res=[]
+        if(nums[0]==0): #zero could be part of any solution
+            res.append(0)
+            del nums[0]
+        if(nums[0]==1): #to build the tree we need a root node with value 1, here we take care of the fact if it is in the input or not
+            res.append(1)
+            del nums[0]
+        root=Node(1,None)
+        for num in nums:
+            root.append(num)
+        longest_path=root.get_longest_path([])
+        del longest_path[0] #delete the root node of 1 at the start of the path
+        res+=longest_path
+        return res
+
+# 354 Russian Doll Envelopes
+"""
+You have a number of envelopes with widths and heights given as a pair
+of integers (w, h). One envelope can fit into another if and only if
+both the width and height of one envelope is greater than the width and
+height of the other envelope.
+
+What is the maximum number of envelopes can you Russian doll? (put one
+inside other)
+
+Note:
+Rotation is not allowed.
+
+Example:
+
+Input: [[5,4],[6,4],[6,7],[2,3]]
+Output: 3
+Explanation: The maximum number of envelopes you can Russian doll is 3
+([2,3] => [5,4] => [6,7]).
+"""
+
+
+class Solution(object):
+    def maxEnvelopes(self, envelopes):
+        """
+        :type envelopes: List[List[int]]
+        :rtype: int
+        """
+        if not envelopes:
+            return 0
+        envelopes = sorted(envelopes, key=lambda x: (x[0], -x[1]))
+        envelopes_height = [x[1] for x in envelopes]
+        return self.LIS(envelopes_height)
+
+    def LIS(self, nums):
+        """
+        Longest increasing sequences
+        """
+
+        def binary_search(l, r, nums, target):
+            while r - l > 1:
+                m = l + (r - l) // 2
+                if nums[m] >= target:
+                    r = m
+                else:
+                    l = m
+            return r
+
+        if not nums:
+            return 0
+
+        size = len(nums)
+        tail_list = [0] * (size + 1)
+        LIS = 0
+        tail_list[0] = nums[0]
+        for i in range(size):
+            if nums[i] < tail_list[0]:
+                tail_list[0] = nums[i]
+            elif nums[i] > tail_list[LIS - 1]:
+                tail_list[LIS] = nums[i]
+                LIS += 1
+            else:
+                tail_list[binary_search(-1, LIS - 1, tail_list,
+                                        nums[i])] = nums[i]
+        return LIS
+
+# Another solution:
+class Solution:
+    def maxEnvelopes(self, envelopes):
+        tails = []
+        for w, h in sorted(envelopes, key = lambda x: (x[0], -x[1])):
+            i = bisect.bisect_left(tails, h)
+            if i == len(tails): tails.append(h)
+            else: tails[i] = h
+        return len(tails)
+
+# 375 Guess Number Higher or Lower II
+"""
+375. Guess Number Higher or Lower II
+Medium
+
+479
+
+689
+
+Favorite
+
+Share
+We are playing the Guess Game. The game is as follows:
+
+I pick a number from 1 to n. You have to guess which number I picked.
+
+Every time you guess wrong, I'll tell you whether the number I picked
+is higher or lower.
+
+However, when you guess a particular number x, and you guess wrong,
+you pay $x. You win the game when you guess the number I picked.
+
+Example:
+
+n = 10, I pick 8.
+
+First round:  You guess 5, I tell you that it's higher. You pay $5.
+Second round: You guess 7, I tell you that it's higher. You pay $7.
+Third round:  You guess 9, I tell you that it's lower. You pay $9.
+
+Game over. 8 is the number I picked.
+
+You end up paying $5 + $7 + $9 = $21.
+Given a particular n ≥ 1, find out how much money you need to have to g
+uarantee a win.
+"""
+class Solution(object):
+    def getMoneyAmount(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+
+        def helper(l, r):
+            if r <= l + 1:
+                cache[(l, r)] = 0
+                return 0
+            if (l, r) in cache:
+                return cache[(l, r)]
+            res = float('inf')
+            for i in range(l, r):
+                res = min(res, nums[i] + max(helper(l, i), helper(i + 1, r)))
+            cache[(l, r)] = res
+            # print(cache)
+            return res
+
+        nums = list(range(n + 1))
+        cache = {}
+        return helper(1, n + 1)
+
+
+class Solution(object):
+    def getMoneyAmount(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        cache = [[0 for _ in range(n + 1)] for _ in range(n + 1)]
+        for lo in range(n - 1, 0, -1):
+            for hi in range(lo + 1, n + 1):
+                cache[lo][hi] = float('inf')
+                for pivot in range(lo, hi):
+                    cache[lo][hi] = min(
+                        cache[lo][hi], pivot + max(cache[lo][pivot - 1],
+                                                   cache[pivot + 1][hi]))
+        return cache[1][n]

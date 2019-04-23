@@ -40,7 +40,6 @@ class Solution(object):
     def recur(path,lastIdx):
             for i in range(lastIdx+1,n):
                 curr = nums[i]
-
                 if curr % path[-1] == 0 :
                     if curr not in seen or seen[curr] < len(path):
                         seen[curr] = len(path)
@@ -56,3 +55,66 @@ class Solution(object):
             recur([nums[i]],i)
         maxKey = max(d.keys())
         return d[maxKey]
+class Node(object):
+        def __init__(self,val,parent):
+            self.val=val
+            self.children=[]
+            self.depth=0
+            self.parent=parent
+        def append(self,val):
+            found=False
+            for child in self.children:
+                if(val%child.val==0):
+                    child.append(val)
+                    found=True
+            if(not found):
+                self.children.append(Node(val,self))
+                self.update_depth(1)
+        def get_longest_path(self,path):
+            path.append(self.val)
+            if(len(self.children)==0):
+                return path
+            maximum_depth=-1
+            max_index=-1
+            for i in range(0,len(self.children)):
+                child_depth=self.children[i].depth
+                if(child_depth>maximum_depth):
+                    maximum_depth=child_depth
+                    max_index=i
+            self.children[max_index].get_longest_path(path)
+            return path
+        def update_depth(self,depth):
+            if(depth<self.depth):
+                return
+            else:
+                self.depth=depth
+                if(self.parent is not None):
+                    self.parent.update_depth(depth+1)
+            return
+
+class Solution(object):
+    def largestDivisibleSubset(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        if(nums is None):
+            return []
+        n=len(nums)
+        if(n<=1):
+            return nums
+        nums.sort()
+        res=[]
+        if(nums[0]==0): #zero could be part of any solution
+            res.append(0)
+            del nums[0]
+        if(nums[0]==1): #to build the tree we need a root node with value 1, here we take care of the fact if it is in the input or not
+            res.append(1)
+            del nums[0]
+        root=Node(1,None)
+        for num in nums:
+            root.append(num)
+        longest_path=root.get_longest_path([])
+        del longest_path[0] #delete the root node of 1 at the start of the path
+        res+=longest_path
+        return res
