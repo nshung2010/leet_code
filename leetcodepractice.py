@@ -9235,3 +9235,91 @@ class Solution(object):
                         cache[lo][hi], pivot + max(cache[lo][pivot - 1],
                                                    cache[pivot + 1][hi]))
         return cache[1][n]
+
+# 376 Wiggle Subsequence
+class Solution(object):
+    def wiggleMaxLength(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) < 2:
+            return len(nums)
+        res = [nums[0]]
+        for i in range(1, len(nums)):
+            sign = (-1)**(len(res)-1)
+            if nums[i]*sign > sign*res[-1]:
+                res.append(nums[i])
+            elif nums[i]*sign < sign*res[-1]:
+                res[-1] = nums[i]
+        max_length = len(res)
+        res = [nums[0]]
+        for i in range(1, len(nums)):
+            sign = (-1)**(len(res))
+            if nums[i]*sign > sign*res[-1]:
+                res.append(nums[i])
+            elif nums[i]*sign < sign*res[-1]:
+                res[-1] = nums[i]
+        max_length = max(max_length, len(res))
+        return max_length
+
+class Solution(object):
+    def wiggleMaxLength(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) < 2:
+            return len(nums)
+        up = [None] * len(nums)
+        down = [None] * len(nums)
+        up[0] = down[0] = 1
+        for i in range(1, len(nums)):
+            if nums[i]>nums[i-1]:
+                up[i] = down[i-1] + 1
+                down[i] = down[i-1]
+            elif nums[i] < nums[i-1]:
+                up[i] = up[i-1]
+                down[i] = up[i-1]+1
+            else:
+                up[i] = up[i-1]
+                down[i] = down[i-1]
+        return max(up[-1], down[-1])
+
+class Solution(object):
+    def wiggleMaxLength(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) < 2:
+            return len(nums)
+        # up = [None] * len(nums)
+        #down = [None] * len(nums)
+        up = down = 1
+        for i in range(1, len(nums)):
+            if nums[i]>nums[i-1]:
+                up = down + 1
+            elif nums[i] < nums[i-1]:
+                down = up +1
+
+        return max(up, down)
+
+class Solution(object):
+    def wiggleMaxLength(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) < 2:
+            return len(nums)
+        # up = [None] * len(nums)
+        #down = [None] * len(nums)
+        pre_diff = nums[1]-nums[0]
+        count = 2 if pre_diff !=0 else 1
+        for i in range(2, len(nums)):
+            diff = nums[i] - nums[i-1]
+            if diff>0 and pre_diff <=0 or diff<0 and pre_diff >=0:
+                count += 1
+                pre_diff = diff
+        return count
