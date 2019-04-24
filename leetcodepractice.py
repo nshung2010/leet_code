@@ -9323,3 +9323,32 @@ class Solution(object):
                 count += 1
                 pre_diff = diff
         return count
+
+# 377 Combination Sum IV
+class Solution(object):
+    def combinationSum4(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        def helper(target):
+
+            count = 0
+            for num in nums:
+                if num > target:
+                    return count
+                elif num == target:
+                    count += 1
+                else:
+                    new_target = target - num
+                    if new_target in cache:
+                        count += cache[new_target]
+                    else:
+                        temp = helper(new_target)
+                        count += temp
+                        cache[new_target] = temp
+            return count
+        cache = {}
+        nums.sort()
+        return helper(target)
