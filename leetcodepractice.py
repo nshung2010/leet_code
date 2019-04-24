@@ -9352,3 +9352,24 @@ class Solution(object):
         cache = {}
         nums.sort()
         return helper(target)
+# 392 Is Subsequence:
+class Solution(object):
+    def isSubsequence(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: bool
+        """
+        def helper(ch, t):
+            for i, t_ch in enumerate(t):
+                # print(t_ch)
+                if t_ch==ch:
+                    return(i, t[i+1:])
+            return (False, t)
+        for ch in s:
+            # print(ch)
+            bool_, t = helper(ch, t)
+            # print(bool_, t)
+            if bool_ is False:
+                return False
+        return True
