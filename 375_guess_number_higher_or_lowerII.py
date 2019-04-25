@@ -39,19 +39,37 @@ class Solution(object):
         :type n: int
         :rtype: int
         """
+
         def helper(l, r):
-            if r<=l+1:
-                cache [(l, r)] = 0
+            if r <= l + 1:
+                cache[(l, r)] = 0
                 return 0
             if (l, r) in cache:
                 return cache[(l, r)]
             res = float('inf')
             for i in range(l, r):
-                res = min(res, nums[i] + max(helper(l, i), helper(i+1, r)))
+                res = min(res, nums[i] + max(helper(l, i), helper(i + 1, r)))
             cache[(l, r)] = res
             # print(cache)
             return res
-        nums = list(range(n+1))
-        cache = {}
-        return helper(1, n+1)
 
+        nums = list(range(n + 1))
+        cache = {}
+        return helper(1, n + 1)
+
+
+class Solution(object):
+    def getMoneyAmount(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        cache = [[0 for _ in range(n + 1)] for _ in range(n + 1)]
+        for lo in range(n - 1, 0, -1):
+            for hi in range(lo + 1, n + 1):
+                cache[lo][hi] = float('inf')
+                for pivot in range(lo, hi):
+                    cache[lo][hi] = min(
+                        cache[lo][hi], pivot + max(cache[lo][pivot - 1],
+                                                   cache[pivot + 1][hi]))
+        return cache[1][n]

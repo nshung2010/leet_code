@@ -9373,3 +9373,40 @@ class Solution(object):
             if bool_ is False:
                 return False
         return True
+
+# 403 Frog Jump
+class Solution(object):
+    def canCross(self, stones):
+        """
+        :type stones: List[int]
+        :rtype: bool
+        """
+        def helper(current, prev):
+            if (current, prev) in memo:
+                return memo[(current, prev)]
+            if current == stones[-1]:
+                memo[(current, prev)] = True
+                return True
+            if current > stones[-1]:
+                memo[(current, prev)] = False
+                return False
+            if current not in stones:
+                memo[(current, prev)] = False
+                return False
+            last_step = current - prev
+            for step in [last_step-1, last_step, last_step+1]:
+                if step >0 and helper(current+step, current):
+                    memo[(current, prev)] = True
+                    return True
+            memo[(current, prev)] = False
+            return False
+        if not stones:
+            return False
+        if len(stones)==1:
+            return True
+        if stones[1]-stones[0] != 1:
+            return False
+        memo = {}
+        # helper(stones[1], stones[0])
+        # print(memo)
+        return helper(stones[1], stones[0])
