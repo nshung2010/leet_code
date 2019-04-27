@@ -9609,3 +9609,29 @@ class Solution(object):
             else:
                 dp=0
         return count
+
+# 416 Partition equal subset sum
+class Solution(object):
+    def canPartition(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: bool
+        """
+        nums.sort(reverse=True)
+        if sum(nums) % 2 != 0:
+            return False
+        target = sum(nums)//2
+        n = len(nums)
+        def dfs(i, target):
+            # print(target, memo)
+            if target in memo:
+                return memo[target]
+            memo[target] = False
+            if target > 0:
+                for j in range(i, n):
+                    if dfs(j+1, target-nums[j]):
+                        memo[target] = True
+                        break
+            return memo[target]
+        memo = {0: True}
+        return dfs(0, target)
