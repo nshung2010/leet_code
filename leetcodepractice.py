@@ -9635,3 +9635,46 @@ class Solution(object):
             return memo[target]
         memo = {0: True}
         return dfs(0, target)
+
+# backtracking list: 10, 17, 22, 37, 39, 40, 44, 46, 47, 51, 52, 60,
+# 77, 78, 79, 89, 90, 93, 126, 131, 140, 211, 212, 216, 306, 357, 401,
+# 526, 691, 784, 842, 980, 996
+
+# 464 Can I win:
+"""
+The variable "cur" represents which numbers have been chosen
+and which are not. For example, if maxChoosableInteger = 8, we have all
+the numbers we can choose from: 1, 2, 3, 4, 5, 6, 7, 8.
+
+The "cur" variable lets us know the state of our number stock.
+Originally, cur = 0, or cur = 0000 0000 (in 8-bit system). This means,
+all number from 1 to 8 have not been chosen.
+At some point, let's say cur = 0000 0001, that means number 1 have been
+picked by some player. Or when cur = 0000 0101, this means number 1 and
+3 have been picked.
+
+And so if (cur >> i) & 1 == 0 is checking if number (i+1) has been
+picked yet or not, so we don't pick what has been picked (since the
+problem said that we pick without replacement, which means you cannot
+reuse a number). You shouldn't do what I did, just use hash set.
+Looking back at this, I don't understand why I did this and not use a
+hash set. @@
+"""
+class Solution(object):
+    def canWin(self, maxChoosableInteger, desiredTotal, cur, d):
+        if cur in d: return d[cur]
+        if desiredTotal <= 0:
+            d[cur] = False
+            return d[cur]
+        for i in range(maxChoosableInteger):
+            if (cur >> i) & 1 == 0:
+                if not self.canWin(maxChoosableInteger, desiredTotal - (i+1), cur + (1 << i), d):
+                    d[cur] = True
+                    return d[cur]
+        d[cur] = False
+        return d[cur]
+
+    def canIWin(self, maxChoosableInteger, desiredTotal):
+        if desiredTotal <= 0: return True
+        if (maxChoosableInteger+1)*maxChoosableInteger/2 < desiredTotal: return False
+        return self.canWin(maxChoosableInteger, desiredTotal, 0, {})
